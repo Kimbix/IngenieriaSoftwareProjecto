@@ -5,6 +5,8 @@
   --background-accent-semi-light-color: #113b77;
   --foreground-color: #efefef;
 
+  --foreground-hyperlink-color: #15BB62;
+
   --navbar-size: calc(3rem + 10px);
 }
 
