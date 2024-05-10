@@ -18,9 +18,22 @@
   flex-flow: column nowrap;
   overflow: hidden;
 
+  justify-content: center;
   align-items: center;
+  height: 75vh;
 
   flex-grow:1;
+}
+
+.description-container h1 {
+  margin: unset;
+  font-size: 7.5rem;
+}
+
+.description-container p {
+  margin: unset;
+  max-width: 80vw;
+  font-size: 2rem;
 }
 
 .developers-container {
@@ -35,21 +48,13 @@
   font-size: 2rem;
 }
 
-.description-container h1 {
-  margin: unset;
-  font-size: 5rem;
-}
-.description-container p {
-  margin: unset;
-  font-size: 1rem;
-}
 
 .developer-box {
   display: flex;
   flex-flow: column nowrap;
   overflow: hidden;
 
-  width: 25rem;
+  width: 20rem;
 }
 
 .developer-box h2 {

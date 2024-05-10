@@ -1,11 +1,13 @@
 import NavigationBar from "./NavigationBar";
 import "./LandingInterface.css";
 
+// TODO: Cambiar tagline
 function Description() {
   return (
     <div className="description-container">
-      <h1 className="description-header">HorariosPlusPlus</h1>
-      <p className="description-content">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nihil laudantium fuga quibusdam nisi libero dolore possimus animi! Eaque in quis sunt animi deleniti amet fugit. Nostrum voluptatum laudantium minus soluta.</p>
+      <h1>Horarios</h1>
+      <h1>PlusPlus</h1>
+      <p>Genera, Controla, Visualiza, Analiza tu Horario Universitario.</p>
     </div>
   )
 }
