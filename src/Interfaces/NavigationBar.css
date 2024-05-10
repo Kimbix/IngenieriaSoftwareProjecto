@@ -1,0 +1,22 @@
+.navbar-container {
+  background: var(--background-accent-semi-light-color);
+  position: absolute;
+  top: 0;
+
+  display: flex;
+  flex-flow: row nowrap;
+  overflow: hidden;
+
+  align-items: center;
+
+  width: 100vw;
+  max-width: 100vw;
+
+  height: var(--navbar-size);
+}
+
+.navbar-container h1 {
+  margin: unset;
+  margin-left: 0.5rem;
+  font-size: 2rem;
+}
