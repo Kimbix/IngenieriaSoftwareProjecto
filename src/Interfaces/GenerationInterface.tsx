@@ -1,94 +1,70 @@
 import NavigationBar from "./NavigationBar"
+import CourseSemesterContainer from "./CourseSemesterContainer"
 import "./GenerationInterface.css"
+import React, { type ReactEventHandler } from "react"
 
-function Generated(){
-  return (
-    <div>
-      emestergerenar
-    </div>
-  )
-}
-
-function NavigationBox(){
-  return (
-    <div>
-      
-    </div>
-  )
-}
-
-/* generated schedules go here */
 function ScheduleBox() {
   return (
     <div className="schedule-box">
-      <h2>hola soy german</h2>
-
+      // TODO: Generated schedules goes here
     </div>
   )
 }
 
+interface SectionInput {
+  disabled : boolean;
+}
 
-
-
-function CarrerDropDown(){
+function Section({ disabled } : SectionInput) {
   return (
     <div>
-      career
+      Mock Section
+      <input type="checkbox" disabled={disabled}/>
     </div>
   )
 }
 
-function SemesterDropDown(){
+function Course() {
+  const [enabled, setEnabled] = React.useState(false);
+
+  function handleActivate(event : any) {
+    setEnabled(!enabled)
+  }
+
   return (
     <div>
-       <label>Choose a car:</label>
-
-      <select name="cars" id="cars">
-        <option value="volvo">Volvo</option>
-        <option value="saab">Saab</option>
-        <option value="mercedes">Mercedes</option>
-        <option value="audi">Audi</option>
-      </select> 
+      Mock Course
+      <input type="checkbox" checked={enabled} onClick={handleActivate}/>
+      <Section disabled={!enabled}/>
     </div>
   )
 }
 
+// TODO: Here goes possible courses
 function CourseContainer(){
   return (
     <div className="course-container">
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus nam natus consequuntur tenetur minus ea quidem et deserunt omnis, mollitia atque dolorem perspiciatis cum est optio nostrum temporibus voluptas quas.
+      <Course/>
+      <Course/>
     </div>
   )
 }
 function GenerateButton(){
+  async function sendGenerateSignal(event : any) {
+    alert("We sent a signal to the server, awaiting response")
+  }
+
   return (
-    <div>
-      emestergerenar
+    <div className="generate-button-container">
+      <button onClick={sendGenerateSignal}> GENERAR </button>
     </div>
   )
 }
 
-
 function CourseBox() {
   return (
     <div className="course-box">      
-        <CarrerDropDown/>
-        <SemesterDropDown/>
+        <CourseSemesterContainer/>
         <CourseContainer/>
         <GenerateButton/>
     </div>
