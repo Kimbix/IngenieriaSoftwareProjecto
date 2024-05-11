@@ -17,15 +17,15 @@ export default function CourseSemesterContainer() {
 
   return (
     <div>
-      <div className="semester-dropdown-container">
-        <select value={selectedSemester} onChange={handleSemesterChange}>
-          <option value="20240205">2024 Feb-Jun</option>
-        </select> 
-      </div>
       <div className="career-dropdown-container">
         <select value={selectedCareer} onChange={handleCareerChange}>
           <option value="ingenieria_informatica">Ingenieria Informatica</option>
           <option value="theology">Teologia</option>
+        </select> 
+      </div>
+      <div className="semester-dropdown-container">
+        <select value={selectedSemester} onChange={handleSemesterChange}>
+          <option value="20240205">2024 Feb-Jun</option>
         </select> 
       </div>
     </div>
