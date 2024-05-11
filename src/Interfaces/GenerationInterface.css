@@ -1,0 +1,30 @@
+.main-container{
+  display: flex;
+
+  /* Para posicionar el main container */
+  height: 100vh;
+  max-height: 100vh;
+  box-sizing: border-box;
+  padding-top: var(--navbar-size);
+
+  flex-flow: row nowrap;
+  overflow: hidden;
+
+} 
+
+.course-box{
+  display: flex;
+  flex-flow: column nowrap;
+  flex-basis: 30%;
+  overflow: hidden;
+
+}
+
+.schedule-box{
+  flex-basis: 70%;
+
+}
+.course-container{
+  flex-grow: 1;
+  overflow: scroll;
+}
