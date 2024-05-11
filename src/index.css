@@ -1,8 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
 
 :root {
-  --background-accent-color: #0c192a;
-  --background-accent-semi-light-color: #113b77;
+  --background-color: #0c192a;
+  --background-semi-light-color: #0F2648;
+  --background-light-color: #113b77;
+
   --foreground-color: #efefef;
 
   --foreground-hyperlink-color: #15BB62;
@@ -11,7 +13,7 @@
 }
 
 body {
-  background-color: var(--background-accent-color);
+  background-color: var(--background-color);
   color: var(--foreground-color);
 
   margin: 0;

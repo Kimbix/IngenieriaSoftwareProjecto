@@ -5,6 +5,7 @@ import reportWebVitals from './reportWebVitals.js';
 
 import LandingInterface from './Interfaces/LandingInterface.tsx';
 import GenerationInterface from "./Interfaces/GenerationInterface.tsx";
+import TimeBlockInterface from './Interfaces/TimeBlockInterface.tsx';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 export default function App() {
@@ -13,7 +14,8 @@ export default function App() {
      <Routes>
       <Route path="/">
         <Route index element={<LandingInterface/>}/>
-        <Route path="generation" element={<GenerationInterface/>}/>
+        <Route path="/generation" element={<GenerationInterface/>}/>
+        <Route path="/time_blocks" element={<TimeBlockInterface/>}/>
       </Route>
      </Routes>
     </BrowserRouter>
