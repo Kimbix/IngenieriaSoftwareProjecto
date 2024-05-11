@@ -28,3 +28,18 @@
   flex-grow: 1;
   overflow: scroll;
 }
+
+.career-dropdown-container {
+  display: flex;
+  justify-content: center;
+}
+
+.semester-dropdown-container {
+  display: flex;
+  justify-content: center;
+}
+
+.generate-button-container {
+  display: flex;
+  justify-content: center;
+}
