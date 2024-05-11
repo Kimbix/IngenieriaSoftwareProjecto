@@ -14,7 +14,18 @@ class Seccion {
   set horas(v: Array<[Date, Date]>) {
     this._horas = v;
   }
+  public seccionesSeCruzan(otraSeccion: Seccion): boolean {
+      for (const hora of this._horas) {
+          for (const otraHora of otraSeccion.horas) {
+              if (hora[0] < otraHora[1] && hora[1] > otraHora[0]) {
+                  return true;
+              }
+          }
+      }
+      return false;
+  }
 }
+
 class Materia {
   protected nombre: string;
   protected secciones: Map<string, Seccion>;

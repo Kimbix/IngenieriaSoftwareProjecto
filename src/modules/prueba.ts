@@ -7,6 +7,7 @@ await mongoose.connect("mongodb://127.0.0.1:27017/mongoose-app");
 // create new Animal
 const cow = new Animal({
   name: "Cow",
+  
   sound: "Moo",
 });
 await cow.save(); // saves to the database
