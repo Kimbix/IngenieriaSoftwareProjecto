@@ -17,9 +17,13 @@ interface SectionInput {
 
 function Section({ disabled } : SectionInput) {
   return (
-    <div>
-      Mock Section
-      <input type="checkbox" disabled={disabled}/>
+    <div className="section">
+      <div>
+        Mock Section
+      </div>
+      <div className="checkbox">
+        <input type="checkbox" disabled={disabled}/>
+      </div>
     </div>
   )
 }
@@ -33,10 +37,20 @@ function Course() {
 
   return (
     <div>
-      Mock Course
-      <input type="checkbox" checked={enabled} onClick={handleActivate}/>
-      <Section disabled={!enabled}/>
+      <div className="course">
+        <div className="course-name">
+          Mock Course
+        </div>
+        <div className="checkbox">
+          <input type="checkbox" checked={enabled} onClick={handleActivate}/>
+        </div>
+      </div>
+      <div>
+        <Section disabled={!enabled}/>
+        <Section disabled={!enabled}/>
+      </div>
     </div>
+
   )
 }
 

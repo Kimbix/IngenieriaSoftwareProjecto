@@ -18,6 +18,8 @@
   flex-basis: 30%;
   overflow: hidden;
 
+  background-color: var(--background-semi-dark-color);
+
 }
 
 .schedule-box{
@@ -27,6 +29,28 @@
 .course-container{
   flex-grow: 1;
   overflow: scroll;
+
+  background-color: var(--background-semi-dark-color);
+}
+
+
+.course {
+  padding: 10px 20px;
+  display: flex;
+  flex-flow: row;
+  background-color: var(--background-medium-color);
+}
+
+.section {
+  display: flex;
+  flex-flow: row;
+  padding-left: 10px;
+  padding-top: 5px;
+
+}
+
+.checkbox {
+  margin-left: auto;
 }
 
 .career-dropdown-container {
