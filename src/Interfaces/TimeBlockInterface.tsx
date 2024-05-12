@@ -162,7 +162,7 @@ interface ActionableButton {
 function SaveButton({ action }: ActionableButton) {
   return (
     <div className="save-button">
-      <button onClick={action} type="button">Save</button>
+      <button onClick={action} type="button">Guardar</button>
     </div>
   )
 }
@@ -180,9 +180,10 @@ interface Class {
 }
 
 interface Section {
-  nrc: string;
-  course: Course;
-  classesList: Array<Class>;
+  nrc: string
+  teacher: string
+  course: Course
+  classesList: Array<Class>
 }
 
 interface EditableSectionContainerProperties {
@@ -216,6 +217,16 @@ function EditableSectionContainer({ selectedSection, updateSectionBind, addClass
     updateSectionBind(selectedSection, newSection)
   }
 
+  function updateSectionTeacher(event: any) {
+    let newTeacher = event.target.value
+    let newSection: Section = selectedSection
+    newSection = {
+      ...newSection,
+      teacher: newTeacher
+    }
+    updateSectionBind(selectedSection, newSection)
+  }
+
   function debugPrintHour(classs: Class) {
     alert(
       "day: " + classs.day +
@@ -230,7 +241,7 @@ function EditableSectionContainer({ selectedSection, updateSectionBind, addClass
         <div className="basic-info" >{selectedSection.course.name}</div>
         <div>NRC: <input value={selectedSection.nrc} onChange={updateSectionNRC} type="text" /></div>
       </div>
-      <div className="teacher-container">Teacher: <input type="text" /></div>
+      <div className="teacher-container">Teacher: <input value={selectedSection.teacher} onChange={updateSectionTeacher} type="text" /></div>
       <div className="day-container">Dias: <button onClick={() => addNewClass()}>ADD</button></div>
       <div>
         {selectedSection.classesList.map((value) => {
@@ -292,7 +303,7 @@ export default function TimeBlockInterface() {
         if (x !== course) return x;
         ret = {
           ...x,
-          sectionList: x.sectionList.concat({ course: course, nrc: findFreeNrc(x.sectionList), classesList: [] })
+          sectionList: x.sectionList.concat([{ course: course, nrc: findFreeNrc(x.sectionList), classesList: [], teacher: "" }])
         }
         return ret
       })
@@ -318,11 +329,13 @@ export default function TimeBlockInterface() {
 
   function updateSectionFromCourse(section: Section, newSection: Section): Section | undefined {
     let ret: Section | undefined = undefined
+    let nrcChanged : boolean = (section.nrc != newSection.nrc)
+
     setLoadedCourses(
       loadedCourses.map((x) => {
         if (!x.sectionList.includes(section)) return x;
 
-        if (x.sectionList.some(y => y.nrc == newSection.nrc)) {
+        if (nrcChanged && x.sectionList.some(y => y.nrc == newSection.nrc)) {
           alert("Dos secciones de la misma materia no pueden tener el mismo NRC")
           ret = section
           return x

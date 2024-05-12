@@ -130,8 +130,12 @@
 
 .delete-day button {
   background-color: var(--background-semi-light-color);
-
 }
+
+.delete-day button:hover {
+  background-color: var(--background-light-color);
+}
+
 
 .day-buttons {
   display: flex;
