@@ -1,7 +1,5 @@
 import React, { type MouseEventHandler } from "react"
 
-import trash from "../svg/trash-svgrepo-com.svg"
-
 import "./TimeBlockInterface.css"
 import NavigationBar from "./NavigationBar"
 import CourseSemesterContainer from "./CourseSemesterContainer"
@@ -17,7 +15,7 @@ interface CourseProperties {
   displayCourse: Course
   newSectionBind: any
   removeSectionBind: any
-  selectSectionBind: any 
+  selectSectionBind: any
 }
 
 function Course({ displayCourse, newSectionBind, removeSectionBind, selectSectionBind }: CourseProperties) {
@@ -50,7 +48,7 @@ function Course({ displayCourse, newSectionBind, removeSectionBind, selectSectio
             <div className="delete-section">
               <button onClick={() => removeExistingSection(value)}> TRASH </button>
             </div>
-          </div>; 
+          </div>;
         })
         }
       </div>
@@ -60,27 +58,30 @@ function Course({ displayCourse, newSectionBind, removeSectionBind, selectSectio
 
 interface HourSelectorProperties {
   changeBind: any
-  hour: number
-  minutes: number
-  date: Date
+  dateBind: Date
 }
 
-function HourSelector({ changeBind, hour, minutes, date }: HourSelectorProperties) {
+function HourSelector({ changeBind, dateBind }: HourSelectorProperties) {
+  // we use new Date() to avoid changing it HERE by reference
+  // Since we want to change it in the changeBind, not here
+
   const handleHourChange = (event: any) => {
-    hour = event.target.value
-    date.setHours(hour)
-    changeBind()
+    let toSend = new Date()
+    toSend.setHours(event.target.value)
+    toSend.setMinutes(dateBind.getMinutes())
+    changeBind(toSend)
   }
 
   const handleMinutesChange = (event: any) => {
-    minutes = event.target.value
-    date.setMinutes(minutes)
-    changeBind()
+    let toSend = new Date() 
+    toSend.setHours(dateBind.getHours())
+    toSend.setMinutes(event.target.value)
+    changeBind(toSend)
   }
 
   return (
     <div className="hour-selection-container">
-      <select value={hour} onChange={handleHourChange}>
+      <select value={dateBind.getHours()} onChange={handleHourChange}>
         <option value="6">6</option>
         <option value="7">7</option>
         <option value="8">8</option>
@@ -97,7 +98,7 @@ function HourSelector({ changeBind, hour, minutes, date }: HourSelectorPropertie
         <option value="19">19</option>
         <option value="20">20</option>
       </select>
-      <select value={minutes} onChange={handleMinutesChange}>
+      <select value={dateBind.getMinutes()} onChange={handleMinutesChange}>
         <option value="00">00</option>
         <option value="15">15</option>
         <option value="30">30</option>
@@ -109,17 +110,16 @@ function HourSelector({ changeBind, hour, minutes, date }: HourSelectorPropertie
 
 interface DaySelectorProperties {
   changeBind: any
-  day: number
+  classBind: Class
 }
 
-function DaySelector({ day, changeBind }: DaySelectorProperties) {
+function DaySelector({ classBind, changeBind }: DaySelectorProperties) {
   const handleDayChange = (event: any) => {
-    day = event.target.value;
-    changeBind()
+    changeBind(classBind, {...classBind, day: event.target.value })
   }
 
   return (
-    <select value={day} onChange={handleDayChange}>
+    <select value={classBind.day} onChange={handleDayChange}>
       <option value="1">Monday</option>
       <option value="2">Tuesday</option>
       <option value="3">Wednesday</option>
@@ -133,17 +133,24 @@ function DaySelector({ day, changeBind }: DaySelectorProperties) {
 
 interface TimeBlockProperties {
   changeBind: any;
-  dayValue: number;
-  startHour: Date;
-  endHour: Date;
+  classBind: Class
 }
 
-function TimeBlock({ changeBind, dayValue, startHour, endHour }: TimeBlockProperties) {
+function TimeBlock({ changeBind, classBind }: TimeBlockProperties) {
+
+  function updateStart(start: Date) {
+    changeBind(classBind, {...classBind, start: start})
+  }
+  
+  function updateEnd(end: Date) {
+    changeBind(classBind, {...classBind, end: end})
+  }
+
   return (
     <li className="timeblock-container">
-      <DaySelector changeBind={changeBind} day={dayValue} />
-      <HourSelector changeBind={changeBind} hour={startHour.getHours()} minutes={startHour.getMinutes()} date={startHour}/>
-      <HourSelector changeBind={changeBind} hour={endHour.getHours()} minutes={endHour.getMinutes()} date={endHour}/>
+      <DaySelector changeBind={changeBind} classBind={classBind} />
+      <HourSelector changeBind={updateStart} dateBind={classBind.start}/>
+      <HourSelector changeBind={updateEnd} dateBind={classBind.end}/>
     </li>
   )
 }
@@ -166,7 +173,7 @@ interface Course {
 }
 
 interface Class {
-  day: number;
+  day: number,
   start: Date
   end: Date;
   section: Section;
@@ -195,30 +202,25 @@ function EditableSectionContainer({ selectedSection, updateSectionBind, addClass
     removeClassBind(selectedSection, classs)
   }
 
-  function updateClassTime(classs: Class, time: TimeBlockProperties) {
-    let newClass = classs
-    newClass = {
-      ...classs,
-      day: time.dayValue,
-      start: time.startHour,
-      end: time.endHour
-    }
+  function updateClassTime(classs: Class, newClass: Class) {
     updateClassBind(selectedSection, classs, newClass)
   }
 
   function updateSectionNRC(event: any) {
-    let newSection : Section = selectedSection
-    newSection = { ...newSection,
-      nrc: event.target.value
-    } 
+    let newNRC = event.target.value
+    let newSection: Section = selectedSection
+    newSection = {
+      ...newSection,
+      nrc: newNRC
+    }
     updateSectionBind(selectedSection, newSection)
   }
 
-  function debugPrintHour(time: TimeBlockProperties) {
+  function debugPrintHour(classs: Class) {
     alert(
-      "Day: " + time.dayValue + 
-      "\n" + "Start: " + time.startHour.getHours() + ":" + time.startHour.getMinutes() +
-      "\n" + "End: " + time.endHour.getHours() + ":" + time.endHour.getMinutes()
+      "day: " + classs.day +
+      "\n" + "start: " + classs.start.getHours() + ":" + classs.start.getMinutes() +
+      "\n" + "end: " + classs.end.getHours() + ":" + classs.end.getMinutes()
     )
   }
 
@@ -233,8 +235,7 @@ function EditableSectionContainer({ selectedSection, updateSectionBind, addClass
       <div>
         {selectedSection.classesList.map((value) => {
           return <div className="day-buttons">
-            <TimeBlock changeBind={() => updateClassTime(value, { changeBind: undefined, dayValue: value.day, startHour: value.start, endHour: value.end })} dayValue={value.day} startHour={value.start} endHour={value.end}/>
-            <button onClick={() => debugPrintHour({ changeBind: undefined, dayValue: value.day, startHour: value.start, endHour: value.end })}> TEST </button>
+            <TimeBlock changeBind={updateClassTime} classBind={value}/>
             <div className="delete-day">
               <button onClick={() => removeClass(value)}> TRASH </button>
             </div>
@@ -314,34 +315,45 @@ export default function TimeBlockInterface() {
     if (section === selectedSection) { setSelectedSection(undefined); }
     return ret
   }
-  
-  function updateSectionFromCourse( section: Section, newSection : Section): Section {
+
+  function updateSectionFromCourse(section: Section, newSection: Section): Section | undefined {
+    let ret: Section | undefined = undefined
     setLoadedCourses(
       loadedCourses.map((x) => {
         if (!x.sectionList.includes(section)) return x;
-        x.sectionList[x.sectionList.indexOf(section)] = newSection
+
+        if (x.sectionList.some(y => y.nrc == newSection.nrc)) {
+          alert("Dos secciones de la misma materia no pueden tener el mismo NRC")
+          ret = section
+          return x
+        }
+
+        ret = newSection
+        x.sectionList[x.sectionList.indexOf(section)] = ret
         return x
       })
     )
-    setSelectedSection(newSection)
-    return newSection
+
+    setSelectedSection(ret)
+    return ret
   }
 
   function addClassToSection(section: Section): Section {
-    function ReturnDefaultDate(): Date {
+    function ReturnDate(hours: number, minutes: number): Date {
       let ret = new Date()
-      ret.setMinutes(0)
-      ret.setHours(6)
+      ret.setHours(hours)
+      ret.setMinutes(minutes)
       return ret
     }
 
     setLoadedCourses(
       loadedCourses.map((x) => {
         if (!x.sectionList.includes(section)) return x;
-        section.classesList.push({ day: 0, end: ReturnDefaultDate(), start: ReturnDefaultDate(), section: section })
+        section.classesList.push({ day: 0, end: ReturnDate(6, 15), start: ReturnDate(6, 0), section: section })
         return x;
       })
     )
+
     setSelectedSection(section)
     return section
   }
@@ -363,8 +375,14 @@ export default function TimeBlockInterface() {
     setLoadedCourses(
       loadedCourses.map((x) => {
         if (!x.sectionList.includes(section)) return x;
+
+        if (newClass.start.getHours() * 60 + newClass.start.getMinutes() >= newClass.end.getHours() * 60 + newClass.end.getMinutes()) {
+          alert("La hora final de una clase no puede estar detras, o ser igual, a la hora final de la clase")
+          return x
+        }
+
         section.classesList[section.classesList.indexOf(classs)] = newClass
-        return x;
+        return x
       })
     )
     setSelectedSection(section)
@@ -384,7 +402,7 @@ export default function TimeBlockInterface() {
           </div>
         </div>
         <div className="section-edit-container">
-          {selectedSection != undefined && <EditableSectionContainer selectedSection={selectedSection} updateSectionBind={updateSectionFromCourse} addClassBind={addClassToSection} removeClassBind={removeClassFromSection} updateClassBind={updateClassFromSection}/>}
+          {selectedSection != undefined && <EditableSectionContainer selectedSection={selectedSection} updateSectionBind={updateSectionFromCourse} addClassBind={addClassToSection} removeClassBind={removeClassFromSection} updateClassBind={updateClassFromSection} />}
         </div>
       </div>
     </div>
