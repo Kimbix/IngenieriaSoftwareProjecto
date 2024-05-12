@@ -14,8 +14,14 @@ const oddBackgroundColor = "var(--schedule-odd-background)"
 const borderColor = "var(--grid-border-color)" // Ojo pelao que esta variable no esta siendo usada actualmente
 
 const colors = [
-  ""
+  "#484349", "#431E82", "#792359", "#92233B",
+  "#D7263D", "#A83E28", "#772E25", "#8F5800",
+  "#1C7C54", "#386154", "#4E6766", "#2C666E",
+  "#1672A3", "#0A498D", "#1D1D79", "#89355B"
+  
 ]
+
+let availableColors = colors
 
 interface ISession {
   section: ISection
@@ -47,9 +53,11 @@ function ScheduleViewer({ loadedSchedule }: ScheduleViewerProperties) {
   const [subjectList, setSubjectList] = React.useState<ISubject[]>(getSubjectsFromSectionList())
 
   function assignMissingColors(subjectList: ISubject[]) {
+    let colorlist = colors
     subjectList.map((subject) => {
-      const color = "rgb(" + Math.random() * 255 + "," + Math.random() * 255 + "," + Math.random() * 255 + ")"
-      subject.color = color
+      let selectedColor = colorlist[Math.floor(Math.random() * colorlist.length)]
+      subject.color = selectedColor
+      colorlist = colorlist.filter((color) => {return color != selectedColor})
       return subject
     })
   }
@@ -243,9 +251,7 @@ export default function MySheduleInterface() {
     <div>
       <NavigationBar />
       <div className="main-container">
-        <div>
-          <ScheduleViewer loadedSchedule={testSchedule} />
-        </div>
+        <ScheduleViewer loadedSchedule={testSchedule} />
       </div>
     </div>
   )
