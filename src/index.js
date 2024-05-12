@@ -6,6 +6,8 @@ import reportWebVitals from './reportWebVitals.js';
 import LandingInterface from './Interfaces/LandingInterface.tsx';
 import GenerationInterface from "./Interfaces/GenerationInterface.tsx";
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { connectToDatabase, disconnectFromDatabase } from './database.js';
+
 
 export default function App() {
   return (
@@ -20,8 +22,18 @@ export default function App() {
   )
 }
 
+connectToDatabase();
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App/>);
+
+window.addEventListener("beforeunload", (event) => {
+  // Tu código aquí
+  console.log("El usuario está cerrando la página");
+  disconnectFromDatabase();
+  // Si deseas mostrar un mensaje de confirmación antes de cerrar, descomenta la siguiente línea:
+  // event.returnValue = '¿Estás seguro de que quieres salir?';
+});
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

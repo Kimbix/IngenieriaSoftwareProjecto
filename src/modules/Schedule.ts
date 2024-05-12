@@ -1,4 +1,5 @@
-import * as SchemaInterfaces from './Schema';
+import * as SchemaInterfaces from "./Schema";
+import { type TSession, type TSection } from "./Schema";
 
 export class Session implements SchemaInterfaces.ISession {
   start: Date;
@@ -33,22 +34,22 @@ export class Session implements SchemaInterfaces.ISession {
   editEndMinute(minute: number) {
     this.end.setHours(minute);
   }
-  public guardarSession() {
-  // Convertir el objeto session1 a un formato que mongoose pueda entender
+  public saveSession(): TSession {
+    // Convertir el objeto session1 a un formato que mongoose pueda entender
     return {
-    start: this.start,
-    end: this.end,
-    day: this.day
-    // Añade aquí cualquier otro campo necesario
-    }
+      start: this.start,
+      end: this.end,
+      day: this.day,
+      // Añade aquí cualquier otro campo necesario
+    };
   }
 }
-
+//#MARK: linkear a la Materia
 export class Section {
-  nrc: String;
+  nrc: string;
   hours: Array<Session> = [];
 
-  constructor(nrc: String, hours?:Array<Session>) {
+  constructor(nrc: string, hours?: Array<Session>) {
     this.nrc = nrc;
     this.hours = hours || [];
   }
@@ -64,11 +65,17 @@ export class Section {
 
 export class Subject {
   name: String;
+  pensumList: Array<string> = [];
   sections: Array<Section> = [];
 
-  constructor(name: String, sections?: Array<Section>) {
+  constructor(
+    name: String,
+    sections?: Array<Section>,
+    pensums?: Array<string>
+  ) {
     this.name = name;
     this.sections = sections || [];
+    this.pensumList = pensums || [];
   }
 
   addEmptySection() {
@@ -80,10 +87,10 @@ export class Subject {
 }
 export class Schedule {
   protected _primitivo: boolean;
-  protected subjects: Array<Subject>;
+  protected _subjects: Array<Subject>;
   constructor(primitivo: boolean, subjects: Array<Subject>) {
     this._primitivo = primitivo;
-    this.subjects = subjects;
+    this._subjects = subjects;
   }
 
   public get primitivo(): boolean {
@@ -92,6 +99,10 @@ export class Schedule {
 
   public set primitivo(v: boolean) {
     this._primitivo = v;
+  }
+
+  public get subjects(): Array<Subject> {
+    return this._subjects;
   }
 
   /**
