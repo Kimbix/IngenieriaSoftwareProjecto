@@ -1,45 +1,89 @@
-class Seccion {
-  protected _horas: Array<[Date, Date]>;
-  Seccion(): void {
-    this._horas = new Array<[Date, Date]>();
+import * as SchemaInterfaces from './Schema';
+
+export class Session implements SchemaInterfaces.ISession {
+  start: Date;
+  end: Date;
+  day: number;
+
+  constructor(start: Date, end: Date, day?: number) {
+    this.start = start;
+    this.end = end;
+    this.day = day || start.getDay();
   }
 
-  constructor(horas: Array<[Date, Date]>) {
-    this._horas = horas;
+  getDay() {
+    return this.start.getDay();
   }
 
-  public get horas(): Array<[Date, Date]> {
-    return this._horas;
+  editDay(day: number) {
+    let distance: number = day - this.start.getDay();
+    this.start.setDate(this.start.getDate() + distance);
+    this.end.setDate(this.end.getDate() + distance);
   }
-  set horas(v: Array<[Date, Date]>) {
-    this._horas = v;
+  editStartHour(hour: number) {
+    this.start.setHours(hour);
   }
-  public seccionesSeCruzan(otraSeccion: Seccion): boolean {
-      for (const hora of this._horas) {
-          for (const otraHora of otraSeccion.horas) {
-              if (hora[0] < otraHora[1] && hora[1] > otraHora[0]) {
-                  return true;
-              }
-          }
-      }
-      return false;
+  editStartMinute(minute: number) {
+    this.start.setHours(minute);
+  }
+
+  editEndHour(hour: number) {
+    this.end.setHours(hour);
+  }
+  editEndMinute(minute: number) {
+    this.end.setHours(minute);
+  }
+  public guardarSession() {
+  // Convertir el objeto session1 a un formato que mongoose pueda entender
+    return {
+    start: this.start,
+    end: this.end,
+    day: this.day
+    // Añade aquí cualquier otro campo necesario
+    }
   }
 }
 
-class Materia {
-  protected nombre: string;
-  protected secciones: Map<string, Seccion>;
-  constructor(Secciones: Map<string, Seccion>, Datos: string) {
-    this.secciones = Secciones;
-    this.nombre = Datos;
+export class Section {
+  nrc: String;
+  hours: Array<Session> = [];
+
+  constructor(nrc: String, hours?:Array<Session>) {
+    this.nrc = nrc;
+    this.hours = hours || [];
+  }
+
+  addHour() {
+    this.hours.push(new Session(new Date(0), new Date(1)));
+  }
+
+  removeHour(value: Session) {
+    this.hours = this.hours.filter((hour) => hour !== value);
+  }
+}
+
+export class Subject {
+  name: String;
+  sections: Array<Section> = [];
+
+  constructor(name: String, sections?: Array<Section>) {
+    this.name = name;
+    this.sections = sections || [];
+  }
+
+  addEmptySection() {
+    this.sections.push(new Section("Section " + (this.sections.length + 1)));
+  }
+  removeSection(value: Section) {
+    this.sections = this.sections.filter((sec) => sec !== value);
   }
 }
 export class Schedule {
   protected _primitivo: boolean;
-  protected materias;
-  constructor(primitivo: boolean, materias: Map<string, Materia | string>) {
+  protected subjects: Array<Subject>;
+  constructor(primitivo: boolean, subjects: Array<Subject>) {
     this._primitivo = primitivo;
-    this.materias = materias;
+    this.subjects = subjects;
   }
 
   public get primitivo(): boolean {
@@ -53,29 +97,29 @@ export class Schedule {
   /**
    * obtenerHorarios
    */
-  public obtenerHorarios(materias: Materia[]): Schedule[] {
-    materias.forEach((materia) => {
+  public obtenerHorarios(subjects: Subject[]): Schedule[] {
+    subjects.forEach((materia) => {
       console.log(materia);
     });
     return [
-      new Schedule(true, new Map<string, Materia | string>()),
-      new Schedule(true, new Map<string, Materia | string>()),
+      new Schedule(true, new Array<Subject>()),
+      new Schedule(true, new Array<Subject>()),
     ];
   }
 }
 
 function main() {
-  const horas = new Array<[Date, Date]>();
-  const mateA1: Seccion = new Seccion(horas);
+  /*const horas = new Array<[Date, Date]>();
+  const mateA1: Seccion = new Seccion("n321", horas);
   const inicio = new Date(0);
   const fin = new Date(inicio.getTime() + 1000 * 60 * 60 * 2);
   mateA1.horas.push([inicio, fin]);
   const secciones = new Map<string, Seccion>();
   secciones.set("Matamathics", mateA1);
   const matematicaBasica: Materia = new Materia(secciones, "Matematica Basica");
-  const materias = new Map<string, Materia | string>();
-  materias.set("Matematica Basica", matematicaBasica);
-  const horario = new Schedule(false, materias);
+  const subjects = new Map<string, Materia | string>();
+  subjects.set("Matematica Basica", matematicaBasica);
+  const horario = new Schedule(false, subjects);
   horario.primitivo = true;
   console.log(horario);
   for (let index = 0; index < 10; index++) {
@@ -83,6 +127,6 @@ function main() {
   }
   console.log(Bun.inspect(horario));
 
-  console.info(Bun.nanoseconds() / 1000000);
+  console.info(Bun.nanoseconds() / 1000000);*/
 }
 main();
