@@ -292,12 +292,10 @@ export default function TimeBlockInterface() {
         }))
       }))
     })
-    console.log(retSubject)
   }
 
   function changeSelectedSection(section: ISection) {
     setSelectedSection(section)
-    console.log("Section NRC: " + section.nrc + " from course " + section.course.name)
   }
 
   // Adds new section to a specified course
@@ -390,7 +388,6 @@ export default function TimeBlockInterface() {
     setLoadedSubjects(
       loadedSubjects.map((x) => {
         if (!x.sectionList.includes(section)) return x;
-        console.log(session.day)
         section.classesList = section.classesList.filter(y => y !== session)
         return x;
       })
