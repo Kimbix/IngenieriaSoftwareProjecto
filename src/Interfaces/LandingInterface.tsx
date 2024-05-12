@@ -7,7 +7,7 @@ function Description() {
     <div className="description-container">
       <h1>Horarios</h1>
       <h1>PlusPlus</h1>
-      <p>Genera, Controla, Visualiza, Analiza tu Horario Universitario.</p>
+      <p>Planea, Genera, Controla y Visualiza  tu Horario Universitario.</p>
     </div>
   )
 }
