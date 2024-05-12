@@ -6,8 +6,16 @@ import "./MyScheduleInterface.css"
 import { Schedule, Subject, Section, Session } from "../modules/Schedule.ts"
 
 const dayNames = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
-const dayHours = [0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+const dayHours = ["Hora/Dia", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"]
 const empty = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+const evenBackgroundColor = "var(--schedule-even-background)"
+const oddBackgroundColor = "var(--schedule-odd-background)"
+const borderColor = "var(--grid-border-color)" // Ojo pelao que esta variable no esta siendo usada actualmente
+
+const colors = [
+  ""
+]
 
 interface ISession {
   section: ISection
@@ -74,44 +82,61 @@ function ScheduleViewer({ loadedSchedule }: ScheduleViewerProperties) {
     return "" + (time.getHours() > 9 ? time.getHours() : "0" + time.getHours()) + ":" + (time.getMinutes() == 0 ? "00" : time.getMinutes())
   }
 
+  let remainingSkip = 0
+  let remaningSession = undefined
+
   function CreateSubdivisions(sessionsToday: ISession[], hour: number): any {
-    return <div className="hour-subdivision">
+
+    return <>
       {["00", "15", "30", "45"].map((subsection) => {
+        if (remainingSkip > 0) {
+          remainingSkip -= 1
+          return undefined
+        }
+
         let currentSession: ISession | undefined = sessionsToday.filter((session) => hourInBetween(session.start, session.end, hour + 6, parseInt(subsection)))?.at(0)
         if (currentSession == undefined) {
-          return <div/>
+          return <div style={{
+            borderTop: subsection == "00" ? "1px solid " + borderColor : undefined,
+            borderBottom: subsection == "45" ? "1px solid " + borderColor : undefined,
+            backgroundColor: hour % 2 == 0 ? evenBackgroundColor : oddBackgroundColor
+          }} />
         }
+
+        remainingSkip = (((currentSession.end.getHours() * 60 + currentSession.end.getMinutes()) -
+          (currentSession.start.getHours() * 60 + currentSession.start.getMinutes())) / 15)
 
         let color = currentSession?.section?.subject.color
-        let isFirstHour = hourIsSame(currentSession.start, hour + 6, parseInt(subsection))
-        let borderTop = isFirstHour ? "2px solid #000" : undefined
 
-        if (isFirstHour) {
-          return <div style={{ background: color, borderTop: borderTop }}>
-            {currentSession.section.subject.name} <br/>
-            {"NRC: " + currentSession.section.nrc} <br/>
+        
+        return <>
+          <div className="session-grid-item" style={{ padding: "2px", background: color, gridRow: "span " + remainingSkip }}>
+            {currentSession.section.subject.name} <br />
+            {"NRC: " + currentSession.section.nrc} <br />
             {DateToString(currentSession.start) + " - " + DateToString(currentSession.end)}
           </div>
-        }
-
-        let minutes = parseInt(subsection)
-        let hourMinus = (hour + 6) - (minutes + 15 < 0 ? 1 : 0)
-        let minutesMinus = (minutes + 15) < 0 ? 45 : minutes + 15
-
-        let isLastHour = hourIsSame(currentSession.end, hourMinus, minutesMinus)
-        let borderBottom = isLastHour ? "2px solid #000" : undefined
-
-        return <div style={{ background: color, borderBottom: borderBottom }} />
+          <div style={{
+            borderTop: subsection == "00" ? "1px solid " + borderColor : undefined,
+            borderBottom: subsection == "45" ? "1px solid " + borderColor : undefined,
+            backgroundColor: hour % 2 == 0 ? evenBackgroundColor : oddBackgroundColor
+          }} />
+        </>
       })}
-    </div>
+    </>
   }
 
   return (
     <div className="grid-container">
-      {dayHours.map((hour) => {
-        return <div>
-          {hour}
-        </div>
+      {dayHours.map((hour, index) => {
+        if (index == 0)
+          return <div className="center-box-contents" style={{ height: "100%", boxSizing: "border-box", borderTop: "1px solid " + borderColor, borderBottom: "2px soli10" + borderColor }}>
+            <div> {hour} </div>
+          </div>
+        return <>
+          <div className="center-box-contents hour-grid" style={{ height: "100%", gridRow: "span 4", boxSizing: "border-box", borderTop: "1px solid " + borderColor, borderBottom: "1px solid " + borderColor }} >
+            <div> {hour} </div>
+          </div>
+        </>
       })}
       {
         dayNames.map((dayName) => {
@@ -123,7 +148,10 @@ function ScheduleViewer({ loadedSchedule }: ScheduleViewerProperties) {
           })
           return empty.map((mock, index) => {
             return <>
-              {index == 0 && <div> {dayName} </div>}
+              {index == 0 &&
+                <div className="center-box-contents day-grid" style={{ height: "100%", border: "1px solid " + borderColor }} >
+                  <div> {dayName} </div>
+                </div>}
               {CreateSubdivisions(sessionsToday, index)}
             </>
           })
