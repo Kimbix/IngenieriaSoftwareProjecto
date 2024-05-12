@@ -1,21 +1,64 @@
 import React, { type MouseEventHandler } from "react"
 
+import { Schedule, Subject, Section, Session } from "../modules/Schedule.ts"
+
 import "./TimeBlockInterface.css"
 import NavigationBar from "./NavigationBar"
 import CourseSemesterContainer from "./CourseSemesterContainer"
 import { setSelectionRange } from "@testing-library/user-event/dist/utils"
 
-/* TODO
-  Funcion que envie al backend la seccion modificada
-  Funcion que envie al backend una instruccion para remover la seccion
-  Funcion que envie al backend una instruccion para agregar una nueva
-*/
+interface ISession {
+  day: number,
+  start: Date
+  end: Date;
+  section: ISection;
+}
+
+interface ISection {
+  nrc: string
+  teacher: string
+  course: ISubject
+  classesList: Array<ISession>
+}
+
+interface ISubject {
+  name: string;
+  sectionList: Array<ISection>;
+}
+
+interface EditableSectionContainerProperties {
+  selectedSection: ISection
+  updateSectionBind: any
+  addClassBind: any
+  removeClassBind: any
+  updateClassBind: any
+  saveDataBind: any
+}
+
+interface HourSelectorProperties {
+  changeBind: any
+  dateBind: Date
+}
 
 interface CourseProperties {
-  displayCourse: Course
+  displayCourse: ISubject
   newSectionBind: any
   removeSectionBind: any
   selectSectionBind: any
+}
+
+interface DaySelectorProperties {
+  changeBind: any
+  classBind: ISession
+}
+
+interface TimeBlockProperties {
+  changeBind: any;
+  classBind: ISession
+}
+
+interface ActionableButton {
+  action: MouseEventHandler;
 }
 
 function Course({ displayCourse, newSectionBind, removeSectionBind, selectSectionBind }: CourseProperties) {
@@ -23,7 +66,7 @@ function Course({ displayCourse, newSectionBind, removeSectionBind, selectSectio
     displayCourse = newSectionBind(displayCourse)
   }
 
-  function removeExistingSection(section: Section) {
+  function removeExistingSection(section: ISection) {
     displayCourse = removeSectionBind(displayCourse, section)
   }
 
@@ -56,10 +99,6 @@ function Course({ displayCourse, newSectionBind, removeSectionBind, selectSectio
   )
 }
 
-interface HourSelectorProperties {
-  changeBind: any
-  dateBind: Date
-}
 
 function HourSelector({ changeBind, dateBind }: HourSelectorProperties) {
   // we use new Date() to avoid changing it HERE by reference
@@ -108,10 +147,6 @@ function HourSelector({ changeBind, dateBind }: HourSelectorProperties) {
   )
 }
 
-interface DaySelectorProperties {
-  changeBind: any
-  classBind: Class
-}
 
 function DaySelector({ classBind, changeBind }: DaySelectorProperties) {
   const handleDayChange = (event: any) => {
@@ -129,11 +164,6 @@ function DaySelector({ classBind, changeBind }: DaySelectorProperties) {
       <option value="7">Sunday</option>
     </select>
   )
-}
-
-interface TimeBlockProperties {
-  changeBind: any;
-  classBind: Class
 }
 
 function TimeBlock({ changeBind, classBind }: TimeBlockProperties) {
@@ -155,9 +185,6 @@ function TimeBlock({ changeBind, classBind }: TimeBlockProperties) {
   )
 }
 
-interface ActionableButton {
-  action: MouseEventHandler;
-}
 
 function SaveButton({ action }: ActionableButton) {
   return (
@@ -167,49 +194,24 @@ function SaveButton({ action }: ActionableButton) {
   )
 }
 
-interface Course {
-  name: string;
-  sectionList: Array<Section>;
-}
 
-interface Class {
-  day: number,
-  start: Date
-  end: Date;
-  section: Section;
-}
 
-interface Section {
-  nrc: string
-  teacher: string
-  course: Course
-  classesList: Array<Class>
-}
-
-interface EditableSectionContainerProperties {
-  selectedSection: Section
-  updateSectionBind: any
-  addClassBind: any
-  removeClassBind: any
-  updateClassBind: any
-}
-
-function EditableSectionContainer({ selectedSection, updateSectionBind, addClassBind, removeClassBind, updateClassBind }: EditableSectionContainerProperties) {
+function EditableSectionContainer({ selectedSection, updateSectionBind, addClassBind, removeClassBind, updateClassBind, saveDataBind}: EditableSectionContainerProperties) {
   function addNewClass() {
     addClassBind(selectedSection)
   }
 
-  function removeClass(classs: Class) {
-    removeClassBind(selectedSection, classs)
+  function removeClass(session: ISession) {
+    removeClassBind(selectedSection, session)
   }
 
-  function updateClassTime(classs: Class, newClass: Class) {
-    updateClassBind(selectedSection, classs, newClass)
+  function updateClassTime(session: ISession, newClass: ISession) {
+    updateClassBind(selectedSection, session, newClass)
   }
 
   function updateSectionNRC(event: any) {
     let newNRC = event.target.value
-    let newSection: Section = selectedSection
+    let newSection: ISection = selectedSection
     newSection = {
       ...newSection,
       nrc: newNRC
@@ -219,7 +221,7 @@ function EditableSectionContainer({ selectedSection, updateSectionBind, addClass
 
   function updateSectionTeacher(event: any) {
     let newTeacher = event.target.value
-    let newSection: Section = selectedSection
+    let newSection: ISection = selectedSection
     newSection = {
       ...newSection,
       teacher: newTeacher
@@ -227,13 +229,15 @@ function EditableSectionContainer({ selectedSection, updateSectionBind, addClass
     updateSectionBind(selectedSection, newSection)
   }
 
-  function debugPrintHour(classs: Class) {
+  function debugPrintHour(session: ISession) {
     alert(
-      "day: " + classs.day +
-      "\n" + "start: " + classs.start.getHours() + ":" + classs.start.getMinutes() +
-      "\n" + "end: " + classs.end.getHours() + ":" + classs.end.getMinutes()
+      "day: " + session.day +
+      "\n" + "start: " + session.start.getHours() + ":" + session.start.getMinutes() +
+      "\n" + "end: " + session.end.getHours() + ":" + session.end.getMinutes()
     )
   }
+
+  
 
   return (
     <div className="editable-section-container">
@@ -253,42 +257,53 @@ function EditableSectionContainer({ selectedSection, updateSectionBind, addClass
           </div>
         })}
       </div>
-      <SaveButton action={() => alert("Shoud send to server")} />
+      <SaveButton action={saveDataBind} />
     </div>
   )
 }
 
-const testingCourse: Course = {
+const testingCourse: ISubject = {
   name: "Matematica Basica",
   sectionList: []
 }
 
-const testCourse2: Course = {
+const testCourse2: ISubject = {
   name: "Calculo I",
   sectionList: []
 }
 
-const testCourse3: Course = {
+const testCourse3: ISubject = {
   name: "porgmaram I",
   sectionList: []
 }
 
 export default function TimeBlockInterface() {
-  const [selectedSection, setSelectedSection] = React.useState<Section | undefined>(undefined);
-  const [loadedCourses, setLoadedCourses] = React.useState<Array<Course>>(
+  const [selectedSection, setSelectedSection] = React.useState<ISection | undefined>(undefined);
+  const [loadedSubjects, setLoadedSubjects] = React.useState<Array<ISubject>>(
     // Here should go a function to load courses from the backend
     [testingCourse, testCourse2, testCourse3]
   );
 
-  function changeSelectedSection(section: Section) {
+  function saveLoadedCoursesToServer() {
+    let retSubject = loadedSubjects.map((subject: ISubject) => {
+      return new Subject(subject.name, subject.sectionList.map((section) => {
+        return new Section(section.nrc, section.classesList.map((session) =>{
+          return new Session(session.start, session.end, session.day)
+        }))
+      }))
+    })
+    console.log(retSubject)
+  }
+
+  function changeSelectedSection(section: ISection) {
     setSelectedSection(section)
     console.log("Section NRC: " + section.nrc + " from course " + section.course.name)
   }
 
   // Adds new section to a specified course
-  function addSectionToCourse(course: Course): Course {
+  function addSectionToCourse(course: ISubject): ISubject {
 
-    function findFreeNrc(list: Section[]): string {
+    function findFreeNrc(list: ISection[]): string {
       let max = 0;
       list.forEach(x => {
         let x_int = parseInt(x.nrc)
@@ -297,9 +312,9 @@ export default function TimeBlockInterface() {
       return max.toString();
     }
 
-    let ret: Course = course
-    setLoadedCourses(
-      loadedCourses.map(x => {
+    let ret: ISubject = course
+    setLoadedSubjects(
+      loadedSubjects.map(x => {
         if (x !== course) return x;
         ret = {
           ...x,
@@ -311,10 +326,10 @@ export default function TimeBlockInterface() {
     return ret
   }
 
-  function removeSectionFromCourse(course: Course, section: Section): Course {
-    let ret: Course = course
-    setLoadedCourses(
-      loadedCourses.map((x) => {
+  function removeSectionFromCourse(course: ISubject, section: ISection): ISubject {
+    let ret: ISubject = course
+    setLoadedSubjects(
+      loadedSubjects.map((x) => {
         if (x !== course) return x;
         ret = {
           ...x,
@@ -327,12 +342,12 @@ export default function TimeBlockInterface() {
     return ret
   }
 
-  function updateSectionFromCourse(section: Section, newSection: Section): Section | undefined {
-    let ret: Section | undefined = undefined
+  function updateSectionFromCourse(section: ISection, newSection: ISection): ISection | undefined {
+    let ret: ISection | undefined = undefined
     let nrcChanged : boolean = (section.nrc != newSection.nrc)
 
-    setLoadedCourses(
-      loadedCourses.map((x) => {
+    setLoadedSubjects(
+      loadedSubjects.map((x) => {
         if (!x.sectionList.includes(section)) return x;
 
         if (nrcChanged && x.sectionList.some(y => y.nrc == newSection.nrc)) {
@@ -351,7 +366,7 @@ export default function TimeBlockInterface() {
     return ret
   }
 
-  function addClassToSection(section: Section): Section {
+  function addClassToSection(section: ISection): ISection {
     function ReturnDate(hours: number, minutes: number): Date {
       let ret = new Date()
       ret.setHours(hours)
@@ -359,8 +374,8 @@ export default function TimeBlockInterface() {
       return ret
     }
 
-    setLoadedCourses(
-      loadedCourses.map((x) => {
+    setLoadedSubjects(
+      loadedSubjects.map((x) => {
         if (!x.sectionList.includes(section)) return x;
         section.classesList.push({ day: 0, end: ReturnDate(6, 15), start: ReturnDate(6, 0), section: section })
         return x;
@@ -371,12 +386,12 @@ export default function TimeBlockInterface() {
     return section
   }
 
-  function removeClassFromSection(section: Section, classs: Class): Section {
-    setLoadedCourses(
-      loadedCourses.map((x) => {
+  function removeClassFromSection(section: ISection, session: ISession): ISection {
+    setLoadedSubjects(
+      loadedSubjects.map((x) => {
         if (!x.sectionList.includes(section)) return x;
-        console.log(classs.day)
-        section.classesList = section.classesList.filter(y => y !== classs)
+        console.log(session.day)
+        section.classesList = section.classesList.filter(y => y !== session)
         return x;
       })
     )
@@ -384,9 +399,9 @@ export default function TimeBlockInterface() {
     return section
   }
 
-  function updateClassFromSection(section: Section, classs: Class, newClass: Class): Section {
-    setLoadedCourses(
-      loadedCourses.map((x) => {
+  function updateClassFromSection(section: ISection, session: ISession, newClass: ISession): ISection {
+    setLoadedSubjects(
+      loadedSubjects.map((x) => {
         if (!x.sectionList.includes(section)) return x;
 
         if (newClass.start.getHours() * 60 + newClass.start.getMinutes() >= newClass.end.getHours() * 60 + newClass.end.getMinutes()) {
@@ -394,7 +409,7 @@ export default function TimeBlockInterface() {
           return x
         }
 
-        section.classesList[section.classesList.indexOf(classs)] = newClass
+        section.classesList[section.classesList.indexOf(session)] = newClass
         return x
       })
     )
@@ -409,13 +424,13 @@ export default function TimeBlockInterface() {
         <div className="course-box-container">
           <CourseSemesterContainer />
           <div>
-            {loadedCourses?.map((value) => {
+            {loadedSubjects?.map((value) => {
               return <Course displayCourse={value} newSectionBind={addSectionToCourse} removeSectionBind={removeSectionFromCourse} selectSectionBind={changeSelectedSection} />
             })}
           </div>
         </div>
         <div className="section-edit-container">
-          {selectedSection != undefined && <EditableSectionContainer selectedSection={selectedSection} updateSectionBind={updateSectionFromCourse} addClassBind={addClassToSection} removeClassBind={removeClassFromSection} updateClassBind={updateClassFromSection} />}
+          {selectedSection != undefined && <EditableSectionContainer selectedSection={selectedSection} updateSectionBind={updateSectionFromCourse} addClassBind={addClassToSection} removeClassBind={removeClassFromSection} updateClassBind={updateClassFromSection} saveDataBind={saveLoadedCoursesToServer}/>}
         </div>
       </div>
     </div>
