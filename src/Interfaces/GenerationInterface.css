@@ -23,9 +23,16 @@
 }
 
 .schedule-box{
+  display: flex;
   flex-basis: 70%;
-
+  flex-flow: column nowrap;
+  padding: 15px;
+  margin: 15px;
+  border-radius: 15px;
+  
+  background-color: var(--background-semi-dark-color);
 }
+
 .course-container{
   flex-grow: 1;
   overflow: scroll;
@@ -66,4 +73,59 @@
 .generate-button-container {
   display: flex;
   justify-content: center;
+  margin-bottom: 30px; 
+  
+}
+
+.generate-button-container button{
+  font-size: 30px;  
+}
+
+.nav-buttons {
+  display: flex;
+  flex-flow: row;
+  
+}
+
+.nav-buttons button {
+  font-size: 30px;
+}
+
+.r-button {
+  margin-left: auto;
+  margin-right: 15px;
+}
+
+.m-button{
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.l-button {
+  margin-right: auto;
+  margin-left: 15px;
+}
+
+.action-buttons {
+  flex-flow:column;
+  margin-left: auto;
+
+
+}
+
+.filter-button {
+  margin-left: auto;
+}
+
+.schedule-container {
+  margin-top: auto;
+  margin-bottom: auto;
+  flex-basis: 100%; 
+
+  padding: 10px;
+  margin-bottom: 15px;
+  margin-top: 15px;
+  border-radius: 15px;
+  
+  background-color: var(--background-medium-color);
 }
