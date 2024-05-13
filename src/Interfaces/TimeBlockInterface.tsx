@@ -190,6 +190,7 @@ function SaveButton({ action }: ActionableButton) {
   return (
     <div className="save-button">
       <button onClick={action} type="button">Guardar</button>
+      
     </div>
   )
 }
@@ -432,3 +433,4 @@ export default function TimeBlockInterface() {
       </div>
     </div>
   )
+}

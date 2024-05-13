@@ -5,6 +5,7 @@ import {
   connectToDatabase,
   disconnectFromDatabase,
   returnSubjects,
+    saveSubjectDB
 } from './ControllerDB';
 
 // create new Schedule
@@ -40,6 +41,25 @@ app.get('/getClasses', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al obtener las clases' });
+    }
+});
+
+// Ruta para guardar una sección
+app.post('/guardarSeccion', async (req, res) => {
+    try {
+        // Obtener el JSON de materias por guardar del cuerpo de la solicitud
+        const { materias } = req.body;
+
+        let SubjectsToSave:CSchedules.Subject=JSON.parse(materias);
+
+        // Llamar a la función saveSubject para guardar las materias
+        await saveSubjectDB(SubjectsToSave);
+
+        // Enviar una respuesta exitosa
+        res.json({ message: 'Materias guardadas exitosamente' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al guardar las materias' });
     }
 });
 
