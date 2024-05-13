@@ -13,8 +13,6 @@ import {
   disconnectFromDatabase,
 } from "./controller/ControllerDB.ts";
 
-await connectToDatabase();
-
 export default function App() {
   return (
     <BrowserRouter>

@@ -7,21 +7,21 @@ import NavigationBar from "./NavigationBar"
 import CourseSemesterContainer from "./CourseSemesterContainer"
 import { setSelectionRange } from "@testing-library/user-event/dist/utils"
 
-interface ISession {
+export interface ISession {
   day: number,
   start: Date
   end: Date;
   section: ISection;
 }
 
-interface ISection {
+export interface ISection {
   nrc: string
   teacher: string
   course: ISubject
   classesList: Array<ISession>
 }
 
-interface ISubject {
+export interface ISubject {
   name: string;
   sectionList: Array<ISection>;
 }
@@ -190,7 +190,6 @@ function SaveButton({ action }: ActionableButton) {
   return (
     <div className="save-button">
       <button onClick={action} type="button">Guardar</button>
-      
     </div>
   )
 }
@@ -277,13 +276,27 @@ const testCourse3: ISubject = {
   name: "porgmaram I",
   sectionList: []
 }
+async function fetchClasses(): Promise<Array<ISubject>> {
+  try {
+    const response = await fetch('http://localhost:4000/getClasses');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+}
 
+
+// Call the fetchClasses function and assign the result to loadedSubjects
 export default function TimeBlockInterface() {
   const [selectedSection, setSelectedSection] = React.useState<ISection | undefined>(undefined);
-  const [loadedSubjects, setLoadedSubjects] = React.useState<Array<ISubject>>(
-    // Here should go a function to load courses from the backend
-    [testingCourse, testCourse2, testCourse3]
-  );
+  const [loadedSubjects, setLoadedSubjects] = React.useState<Array<ISubject>>([]);
+
+  React.useEffect(() => {
+    fetchClasses().then(data => setLoadedSubjects(data));
+  }, []);
+
 
   function saveLoadedCoursesToServer() {
     let retSubject = loadedSubjects.map((subject: ISubject) => {

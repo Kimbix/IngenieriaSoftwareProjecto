@@ -20,7 +20,6 @@ const subject1 = new CSchedules.Subject("Subject 1", [section1, section2], ["Car
 const subject2 = new CSchedules.Subject("Subject 2", [], ["carrera3"]);
 const schedule1 = new CSchedules.Schedule("dehidalgo.22@est.ucab.edu.ve", [subject1, subject2]);
 
-
 // connect to the database
 export async function connectToDatabase() {
   try {
@@ -73,7 +72,7 @@ function saveSection(section: CSchedules.Section) {
 }
 
 function saveSubject(subject: CSchedules.Subject) {
-  const sections = subject.sections.map((section) => {
+  const sectionsi = subject.sectionList.map((section) => {
     // Aquí asumimos que saveSection devuelve un objeto de sección
     const sectionData = saveSection(section);
     return new mongoModels.SectionModel(sectionData);
@@ -82,7 +81,7 @@ function saveSubject(subject: CSchedules.Subject) {
   // Crear una nueva instancia de Subject con los datos de las secciones
   const docSubject = new mongoModels.SubjectModel({
     name: subject.name,
-    sections: sections,
+    sectionList: sectionsi,
     pensum: subject.pensumList,
   });
 
@@ -138,7 +137,6 @@ export async function readSectionDB(nrc: string) {
 export async function readSessionDB() {
   return await mongoModels.SessionModel.find();
 }
-
 
 export async function returnSubjects(): Promise<Array<CSchedules.Subject>>{
   const docMaterias = await mongoModels.SubjectModel.find();

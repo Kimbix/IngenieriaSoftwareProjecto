@@ -7,6 +7,12 @@ import {
   returnSubjects,
     saveSubjectDB
 } from './ControllerDB';
+import {
+  type ISubject,
+  type ISection,
+  type ISession,
+} from "./../Interfaces/TimeBlockInterface";
+import { json } from 'react-router-dom';
 
 // create new Schedule
 const a1 = new Date(0);
@@ -25,19 +31,57 @@ const subject1 = new CSchedules.Subject("Subject 1", [section1, section2], ["Car
 const subject2 = new CSchedules.Subject("Subject 2", [], ["carrera3"]);
 const schedule1 = new CSchedules.Schedule("dehidalgo.22@est.ucab.edu.ve", [subject1, subject2]);
 
-await connectToDatabase();
+function transformSessionToI(session:CSchedules.Session, aSectionI:ISection) {
 
+    return {
+        day: session.day,
+        start: session.start,
+        end: session.end,
+        section: aSectionI,
+    };
+}
+
+function transformSectionToI(section:CSchedules.Section,aSubjectI:ISubject) {
+    let aSectionI:ISection;
+    let sessions:ISession[]=section.hours.map((session)=>{
+        
+        return transformSessionToI(session, aSectionI);
+    });
+    return {
+        nrc:section.nrc,
+        teacher:"profeDefault",
+        course:aSubjectI,
+        classesList:sessions
+    };
+}
+
+function transformSubjectToI(subject:CSchedules.Subject) {
+    let aSubjectI:ISubject;
+    let sections:ISection[]=subject.sectionList.map((section)=>{
+        return transformSectionToI(section,aSubjectI);
+    });
+    return {
+        name:subject.name,
+        pensumList:subject.pensumList,
+        sectionList:sections
+    }
+}
 // Crear una instancia de Express
+const cors = require("cors");
 const app = express();
 
-// Ruta para obtener todas las clases
+
+app.use(cors());
+
+// Ruta para obtener las clases
 app.get('/getClasses', async (req, res) => {
     try {
-        // Obtener todas las clases de la base de datos
-        const clases = await returnSubjects();
-
-        // Enviar las clases como respuesta en formato JSON
-        res.json(clases);
+        await connectToDatabase();
+        // Obtener los Subjects de la base de datos
+        const subjects = await returnSubjects();
+        await disconnectFromDatabase();
+        // Enviar los Subjects como respuesta
+        res.json(subjects);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al obtener las clases' });
@@ -47,13 +91,17 @@ app.get('/getClasses', async (req, res) => {
 // Ruta para guardar una sección
 app.post('/guardarSeccion', async (req, res) => {
     try {
+        await connectToDatabase();
         // Obtener el JSON de materias por guardar del cuerpo de la solicitud
         const { materias } = req.body;
 
-        let SubjectsToSave:CSchedules.Subject=JSON.parse(materias);
-
+        let SubjectsToSave:CSchedules.Subject[]=JSON.parse(materias);
+        for (const subject of SubjectsToSave) {
+            
+            await saveSubjectDB(subject);
+        }
+        await disconnectFromDatabase();
         // Llamar a la función saveSubject para guardar las materias
-        await saveSubjectDB(SubjectsToSave);
 
         // Enviar una respuesta exitosa
         res.json({ message: 'Materias guardadas exitosamente' });
@@ -65,9 +113,7 @@ app.post('/guardarSeccion', async (req, res) => {
 
 // Iniciar el servidor en el puerto 4000
 app.listen(4000, () => {
-    console.log('Servidor iniciado en el puerto 3000');
+    console.log('Servidor iniciado en el puerto 4000');
 });
 
 console.log(JSON.stringify(session1));
-
-await disconnectFromDatabase();

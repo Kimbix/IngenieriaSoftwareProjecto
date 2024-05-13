@@ -22,7 +22,7 @@ export interface ISection extends TSection{}
 export const SectionModel = mongoose.model("section", SectionSchema);
 
 const SubjectSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true, unique: true },
   sections: [SectionSchema],
   pensum: [String],
 });
