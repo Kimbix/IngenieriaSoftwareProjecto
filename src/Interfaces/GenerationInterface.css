@@ -9,23 +9,25 @@
 
   flex-flow: row nowrap;
   overflow: hidden;
-
 } 
 
-.course-box{
+.course-box {
   display: flex;
   flex-flow: column nowrap;
-  flex-basis: 30%;
+  flex-basis: 20%;
   overflow: hidden;
 
   background-color: var(--background-semi-dark-color);
 
 }
 
-.schedule-box{
+.schedule-box {
   display: flex;
-  flex-basis: 70%;
   flex-flow: column nowrap;
+  overflow: scroll;
+
+  flex-basis: 80%;
+
   padding: 15px;
   margin: 15px;
   border-radius: 15px;
@@ -72,9 +74,10 @@
 
 .generate-button-container {
   display: flex;
+
   justify-content: center;
   margin-bottom: 30px; 
-  
+  margin-top: auto;
 }
 
 .generate-button-container button{
@@ -84,11 +87,10 @@
 .nav-buttons {
   display: flex;
   flex-flow: row;
-  
 }
 
 .nav-buttons button {
-  font-size: 30px;
+  font-size: 20px;
 }
 
 .r-button {
@@ -118,14 +120,26 @@
 }
 
 .schedule-container {
-  margin-top: auto;
-  margin-bottom: auto;
-  flex-basis: 100%; 
+  display: flex;
+  flex-flow: column;
 
+  flex-grow: 1;
   padding: 10px;
+
   margin-bottom: 15px;
   margin-top: 15px;
   border-radius: 15px;
   
-  background-color: var(--background-medium-color);
+  background-color: var(--background-semi-light-color);
+}
+
+.schedule-flex {
+  display: flex;
+  flex-flow: row;
+  place-items: center;
+} 
+
+.two-schedules {
+  display: flex;
+  flex-flow: column;
 }
