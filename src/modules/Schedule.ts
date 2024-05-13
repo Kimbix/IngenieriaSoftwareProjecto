@@ -1,6 +1,6 @@
 import * as SchemaInterfaces from "./Schema";
 import { type TSession, type TSection } from "./Schema";
-
+//#MARK: Session
 export class Session implements SchemaInterfaces.ISession {
   start: Date;
   end: Date;
@@ -44,7 +44,7 @@ export class Session implements SchemaInterfaces.ISession {
     };
   }
 }
-//#MARK: linkear a la Materia
+//#MARK: Section
 export class Section {
   nrc: string;
   hours: Array<Session> = [];
@@ -62,7 +62,7 @@ export class Section {
     this.hours = this.hours.filter((hour) => hour !== value);
   }
 }
-
+//#MARK: Subject
 export class Subject {
   name: String;
   pensumList: Array<string> = [];
@@ -81,24 +81,27 @@ export class Subject {
   addEmptySection() {
     this.sections.push(new Section("Section " + (this.sections.length + 1)));
   }
+  addSection(section: Section) {
+    this.sections.push(section);
+  }
   removeSection(value: Section) {
     this.sections = this.sections.filter((sec) => sec !== value);
   }
 }
 export class Schedule {
-  protected _primitivo: boolean;
+  protected _correo: string;
   protected _subjects: Array<Subject>;
-  constructor(primitivo: boolean, subjects: Array<Subject>) {
-    this._primitivo = primitivo;
+  constructor(correo: string, subjects: Array<Subject>) {
+    this._correo = correo;
     this._subjects = subjects;
   }
 
-  public get primitivo(): boolean {
-    return this._primitivo;
+  public get correo(): string {
+    return this._correo;
   }
 
-  public set primitivo(v: boolean) {
-    this._primitivo = v;
+  public set correo(v: string) {
+    this._correo = v;
   }
 
   public get subjects(): Array<Subject> {
@@ -108,14 +111,12 @@ export class Schedule {
   /**
    * obtenerHorarios
    */
-  public obtenerHorarios(subjects: Subject[]): Schedule[] {
-    subjects.forEach((materia) => {
+  public obtenerHorarios(subjects: Subject[],correos:string[]): Schedule[] {
+    const schedules = subjects.map((materia) => {
       console.log(materia);
+      return new Schedule(correos[0], new Array<Subject>());
     });
-    return [
-      new Schedule(true, new Array<Subject>()),
-      new Schedule(true, new Array<Subject>()),
-    ];
+    return schedules;
   }
 }
 

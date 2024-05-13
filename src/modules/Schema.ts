@@ -1,25 +1,10 @@
 import * as mongoose from 'mongoose';
 
-/* const animalSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true },
-    sound: { type: String, required: true },
-  },
-  {
-    methods: {
-      speak() {
-        console.log(`${this.sound}!`);
-      },
-    },
-  }
-);
-
-export type Animal = mongoose.InferSchemaType<typeof animalSchema>;
-export const Animal = mongoose.model("Animal", animalSchema); */
 const SessionSchema = new mongoose.Schema({
+/*   _id : mongoose.Schema.Types.ObjectId, */
   start: { type: Date, required: true },
   end: { type: Date, required: true },
-  day: { type: Number, required: true }
+  day: { type: Number, required: true },
 });
 
 export type TSession = mongoose.InferSchemaType<typeof SessionSchema>;
@@ -27,8 +12,9 @@ export const SessionModel = mongoose.model("session", SessionSchema);
 export interface ISession extends TSession {}
 
 const SectionSchema = new mongoose.Schema({
-  nrc: { type: String, required: true },
-  hours: { type: [SessionSchema], required: true },
+/*   _id : mongoose.Schema.Types.ObjectId,
+ */  nrc: { type: String, required: true },
+  hours: [SessionSchema],
 });
 
 export type TSection = mongoose.InferSchemaType<typeof SectionSchema>;
@@ -37,7 +23,7 @@ export const SectionModel = mongoose.model("section", SectionSchema);
 
 const SubjectSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  sections: { type: Array<TSection>, required: false },
+  sections: [SectionSchema],
   pensum: [String],
 });
 
@@ -46,7 +32,7 @@ export interface ISubject extends TSubject {}
 export const SubjectModel = mongoose.model("subject", SubjectSchema);
 
 const ScheduleSchema = new mongoose.Schema({
-  primitivo: { type: Boolean, required: false },
+  correo: { type: 'string', required: false },
   subjects: { type: [SubjectSchema], required: true }
 });
 
