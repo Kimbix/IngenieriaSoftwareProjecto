@@ -5,6 +5,7 @@ export default function NavigationBar() {
       <div><a href="/schedule">Mi Horario</a></div>
       <div><a href="/generation">Generar</a></div>
       <div><a href="/time_blocks">Agregar Horario</a></div>
+      <div><a href="/login">Iniciar Secion</a></div>
     </div>
   )
 }

@@ -1,9 +1,8 @@
+import React from "react"
+
 import NavigationBar from "./NavigationBar"
 import CourseSemesterContainer from "./CourseSemesterContainer"
 import "./GenerationInterface.css"
-import React, { type ReactEventHandler } from "react"
-
-import { Schedule, Subject, Section, Session } from "../modules/Schedule.ts"
 import ScheduleViewer from "./ScheduleViewer.tsx"
 
 const colors = [
@@ -55,12 +54,12 @@ function ScheduleContainer({ shownShedules }: ScheduleContainerProperties) {
     <div className="schedule-container">
       <div className="schedule-flex">
         <div className="two-schedules">
-          {shownShedules[0] != undefined && <button> <ScheduleViewer loadedSchedule={shownShedules[0]} /> </button>}
-          {shownShedules[1] != undefined && <button> <ScheduleViewer loadedSchedule={shownShedules[1]} /> </button>}
+          {shownShedules[0] !== undefined && <button> <ScheduleViewer loadedSchedule={shownShedules[0]} /> </button>}
+          {shownShedules[1] !== undefined && <button> <ScheduleViewer loadedSchedule={shownShedules[1]} /> </button>}
         </div>
         <div className="two-schedules">
-          {shownShedules[2] != undefined && <button> <ScheduleViewer loadedSchedule={shownShedules[2]} /> </button>}
-          {shownShedules[3] != undefined && <button> <ScheduleViewer loadedSchedule={shownShedules[3]} /> </button>}
+          {shownShedules[2] !== undefined && <button> <ScheduleViewer loadedSchedule={shownShedules[2]} /> </button>}
+          {shownShedules[3] !== undefined && <button> <ScheduleViewer loadedSchedule={shownShedules[3]} /> </button>}
         </div>
       </div>
     </div>
@@ -125,18 +124,8 @@ export default function GenerationInterface() {
     return subjectList.map((subject) => {
       let selectedColor = colorlist[Math.floor(Math.random() * colorlist.length)]
       subject.color = selectedColor
-      colorlist = colorlist.filter((color) => { return color != selectedColor })
+      colorlist = colorlist.filter((color) => { return color !== selectedColor })
       return subject
-    })
-  }
-
-  function saveLoadedCoursesToServer() {
-    let retSubject = loadedSubjects?.map((subject: ISubject) => {
-      return new Subject(subject.name, subject.sectionList.map((section) => {
-        return new Section(section.nrc, section.sessionList.map((session) => {
-          return new Session(session.start, session.end, session.day)
-        }))
-      }))
     })
   }
 
@@ -173,7 +162,7 @@ export default function GenerationInterface() {
           </div>
           <GenerateButton />
         </div>
-        {generatedSchedules != undefined && <div className="schedule-box">
+        {generatedSchedules !== undefined && <div className="schedule-box">
           <div className="action-buttons">
             <button className="filter-button" type="button">filter</button>
           </div>

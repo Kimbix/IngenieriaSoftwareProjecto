@@ -24,7 +24,7 @@ const schedule1 = new CSchedules.Schedule("dehidalgo.22@est.ucab.edu.ve", [subje
 // connect to the database
 export async function connectToDatabase() {
   try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/horariospp");
+    await mongoose.connect("mongodb://0.tcp.ngrok.io:19680/horariospp");
     console.log("Conexión exitosa a la base de datos");
   } catch (error) {
     console.error("Error al conectar a la base de datos\n" + error + "\n");

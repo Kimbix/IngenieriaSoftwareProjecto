@@ -1,11 +1,9 @@
 import React, { type MouseEventHandler } from "react"
-
-import { Schedule, Subject, Section, Session } from "../modules/Schedule.ts"
+import { Subject, Section, Session } from "../modules/Schedule.ts"
 
 import "./TimeBlockInterface.css"
 import NavigationBar from "./NavigationBar"
 import CourseSemesterContainer from "./CourseSemesterContainer"
-import { setSelectionRange } from "@testing-library/user-event/dist/utils"
 
 interface ISession {
   day: number,
@@ -229,16 +227,6 @@ function EditableSectionContainer({ selectedSection, updateSectionBind, addClass
     updateSectionBind(selectedSection, newSection)
   }
 
-  function debugPrintHour(session: ISession) {
-    alert(
-      "day: " + session.day +
-      "\n" + "start: " + session.start.getHours() + ":" + session.start.getMinutes() +
-      "\n" + "end: " + session.end.getHours() + ":" + session.end.getMinutes()
-    )
-  }
-
-  
-
   return (
     <div className="editable-section-container">
       <div className="editable-section-header">
@@ -285,7 +273,7 @@ export default function TimeBlockInterface() {
   );
 
   function saveLoadedCoursesToServer() {
-    let retSubject = loadedSubjects.map((subject: ISubject) => {
+    loadedSubjects.map((subject: ISubject) => {
       return new Subject(subject.name, subject.sectionList.map((section) => {
         return new Section(section.nrc, section.classesList.map((session) =>{
           return new Session(session.start, session.end, session.day)
@@ -342,13 +330,13 @@ export default function TimeBlockInterface() {
 
   function updateSectionFromCourse(section: ISection, newSection: ISection): ISection | undefined {
     let ret: ISection | undefined = undefined
-    let nrcChanged : boolean = (section.nrc != newSection.nrc)
+    let nrcChanged : boolean = (section.nrc !== newSection.nrc)
 
     setLoadedSubjects(
       loadedSubjects.map((x) => {
         if (!x.sectionList.includes(section)) return x;
 
-        if (nrcChanged && x.sectionList.some(y => y.nrc == newSection.nrc)) {
+        if (nrcChanged && x.sectionList.some(y => y.nrc === newSection.nrc)) {
           alert("Dos secciones de la misma materia no pueden tener el mismo NRC")
           ret = section
           return x
@@ -427,8 +415,9 @@ export default function TimeBlockInterface() {
           </div>
         </div>
         <div className="section-edit-container">
-          {selectedSection != undefined && <EditableSectionContainer selectedSection={selectedSection} updateSectionBind={updateSectionFromCourse} addClassBind={addClassToSection} removeClassBind={removeClassFromSection} updateClassBind={updateClassFromSection} saveDataBind={saveLoadedCoursesToServer}/>}
+          {selectedSection !== undefined && <EditableSectionContainer selectedSection={selectedSection} updateSectionBind={updateSectionFromCourse} addClassBind={addClassToSection} removeClassBind={removeClassFromSection} updateClassBind={updateClassFromSection} saveDataBind={saveLoadedCoursesToServer}/>}
         </div>
       </div>
     </div>
   )
+}

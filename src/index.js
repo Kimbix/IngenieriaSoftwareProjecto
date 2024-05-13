@@ -5,13 +5,11 @@ import reportWebVitals from './reportWebVitals.js';
 
 import LandingInterface from './Interfaces/LandingInterface.tsx';
 import GenerationInterface from "./Interfaces/GenerationInterface.tsx";
-import TimeBlockInterface from './Interfaces/TimeBlockInterface.tsx';
-import MyScheduleInterface from './Interfaces/MyScheduleInterface.tsx';
+import LogInInterface from './Interfaces/LogInInterface.tsx';
+
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { connectToDatabase, disconnectFromDatabase } from './controller/ControllerDB.ts';
 
-
-await connectToDatabase();
 
 export default function App() {
   return (
@@ -19,19 +17,20 @@ export default function App() {
      <Routes>
       <Route path="/">
         <Route index element={<LandingInterface/>}/>
-        <Route path="/generation" element={<GenerationInterface/>}/>
-        <Route path="/time_blocks" element={<TimeBlockInterface/>}/>
-        <Route path="/schedule" element={<MyScheduleInterface/>}/>
+        <Route path="generation" element={<GenerationInterface/>}/>
+        <Route path="login" element={<LogInInterface/>}/>
       </Route>
      </Routes>
     </BrowserRouter>
   )
 }
 
+connectToDatabase();
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App/>);
 
- window.addEventListener("beforeunload", (event) => {
+window.addEventListener("beforeunload", (event) => {
   // Tu código aquí
   console.log("El usuario está cerrando la página");
   disconnectFromDatabase();
