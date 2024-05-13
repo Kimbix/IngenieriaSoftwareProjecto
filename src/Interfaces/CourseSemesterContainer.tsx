@@ -23,18 +23,6 @@ export default function CourseSemesterContainer() {
           <option value="theology">Teologia</option>
         </select> 
       </div>
-      <div className="semester-dropdown-container">
-        <select value={selectedSemester} onChange={handleSemesterChange}>
-          <option value="1">Primer</option>
-          <option value="2">Segundo</option>
-          <option value="3">Tercero</option>
-          <option value="4">Cuarto</option>
-          <option value="5">Quinto</option>
-          <option value="6">Sexto</option>
-          <option value="7">Septimo</option>
-          <option value="8">Octavo</option>
-        </select> 
-      </div>
     </div>
   )
 }
