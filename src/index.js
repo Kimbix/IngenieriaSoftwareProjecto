@@ -6,8 +6,10 @@ import reportWebVitals from './reportWebVitals.js';
 import LandingInterface from './Interfaces/LandingInterface.tsx';
 import GenerationInterface from "./Interfaces/GenerationInterface.tsx";
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { connectToDatabase, disconnectFromDatabase } from './database.js';
+import { connectToDatabase, disconnectFromDatabase } from './controller/ControllerDB.ts';
 
+
+await connectToDatabase();
 
 export default function App() {
   return (
@@ -22,12 +24,10 @@ export default function App() {
   )
 }
 
-connectToDatabase();
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App/>);
 
-window.addEventListener("beforeunload", (event) => {
+ window.addEventListener("beforeunload", (event) => {
   // Tu código aquí
   console.log("El usuario está cerrando la página");
   disconnectFromDatabase();

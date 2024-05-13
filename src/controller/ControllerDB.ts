@@ -3,7 +3,6 @@ import * as mongoose from "mongoose";
 import * as CSchedules from "../modules/Schedule";
 import * as mongoModels from "../modules/Schema";
 
-await connectToDatabase();
 // create new Schedule
 const a1 = new Date(0);
 const a2 = new Date(1);
@@ -136,27 +135,32 @@ export async function saveSessionDB(session: CSchedules.Session) {
 //queries
 
 // Leer
-export function readScheduleDB() {
-  return mongoModels.ScheduleModel.find();
+export async function readScheduleDB() {
+  return await mongoModels.ScheduleModel.find();
 }
 
-export function readSectionDB() {
-  return mongoModels.SectionModel.find();
+export async function readSectionDB(nrc: string) {
+  return await mongoModels.SectionModel.find({nrc: nrc});
 }
-//Obtener una materia por su pensum
+/* // Obtener una materia por su pensum
 export async function readSubjectDB(carrera: string) {
-   const materias = await mongoModels.SubjectModel.find();
-   return materias.filter((materia) => materia.pensum.includes(carrera));
+  try {
+    const materias = await mongoModels.SubjectModel.find();
+    return materias.filter((materia) => materia.pensum.includes(carrera));
+    
+  } catch (error) {
+    console.error("Error al leer las materias de la base de datos\n" + error + "\n");
+  }
+} */
+// Obtener una materia por su pensum
+export async function readAllSubjectDB() {
+  try {
+    return await mongoModels.SubjectModel.find();
+  } catch (error) {
+    console.error("Error al leer las materias de la base de datos\n" + error + "\n");
+  }
 }
 
-await saveSubjectDB(subject1);
-await saveSubjectDB(subject2);
-await saveSectionDB(section1);
-await saveSectionDB(section2);
-await saveSessionDB(session1);
-await saveSessionDB(session2);
-await saveSessionDB(session3);
-await saveScheduleDB(schedule1);
 // Buscar Materias en la base de datos
 /* 
     * añadir lista de Carreras a las Materias
@@ -164,8 +168,8 @@ await saveScheduleDB(schedule1);
     * añadir lista de Profesores a las Secciones
     * Buscar Queri de materias por Carrera
  */
-const a= await readSubjectDB("carrera1")
-console.log(a);
+// const a= await readSectionDB("Section 1");
+// console.log(a);
 
 // read all Animals
 /* const schedules = await scheduleModel.find();
@@ -173,4 +177,3 @@ console.log(schedules[0]); // logs "Moo!"
  */
 
 // disconnect
-await disconnectFromDatabase();
