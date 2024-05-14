@@ -7,6 +7,7 @@ import LandingInterface from './Interfaces/LandingInterface.tsx';
 import GenerationInterface from "./Interfaces/GenerationInterface.tsx";
 import LogInInterface from './Interfaces/LogInInterface.tsx';
 import SignUpInterface from './Interfaces/SignUpInterface.tsx';
+import MySheduleInterface from './Interfaces/MyScheduleInterface.tsx';
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import TimeBlockInterface from './Interfaces/TimeBlockInterface.tsx';
@@ -15,15 +16,16 @@ import TimeBlockInterface from './Interfaces/TimeBlockInterface.tsx';
 export default function App() {
   return (
     <BrowserRouter>
-     <Routes>
+    <Routes>
       <Route path="/">
         <Route index element={<LandingInterface/>}/>
         <Route path="generation" element={<GenerationInterface/>}/>
         <Route path="time_blocks" element={<TimeBlockInterface/>}/>
         <Route path="login" element={<LogInInterface/>}/>
         <Route path="sign_up" element={<SignUpInterface/>}/>
+        <Route path="schedule" element={<MySheduleInterface/>}/>
       </Route>
-     </Routes>
+    </Routes>
     </BrowserRouter>
   )
 }

@@ -1,8 +1,8 @@
 import React, { type MouseEventHandler } from "react"
 
-import "./TimeBlockInterface.css"
-import NavigationBar from "./NavigationBar"
 import CourseSemesterContainer from "./CourseSemesterContainer"
+import NavigationBar from "./NavigationBar"
+import "./TimeBlockInterface.css"
 
 interface ISession {
   day: number,
@@ -202,10 +202,10 @@ function EditableSectionContainer({ selectedSection, updateSectionBind, addClass
     removeClassBind(selectedSection, session)
   }
 
-  function updateClassTime(session: ISession, newClass: ISession) {
-    updateClassBind(selectedSection, session, newClass)
+  function updateClassTime(oldSession: ISession, newSession: ISession) {
+    updateClassBind(selectedSection, oldSession, newSession)
   }
-  // hello  i dont kno
+
   function updateSectionNRC(event: any) {
     let newNRC = event.target.value
     let newSection: ISection = selectedSection
@@ -328,26 +328,35 @@ export default function TimeBlockInterface() {
     return Promise.all(subjects)
   }
 
+  async function fetchSessionFromId(id: string, section: ISection): Promise<ISession> {
+    return await fetch(`http://127.0.0.1:4000/api/session/get_sessions_from_id?id=${id}`,
+      { headers: { 'Accept': 'application/json' } })
+      .then(response => response.json())
+      .catch(e => { console.error(e) })
+      .then(data => {
+        let newSession: ISession = {
+          day: data.day,
+          start: new Date(data.start),
+          end: new Date(data.end),
+          section: section,
+        }
+        return newSession
+      })
+  }
+
   async function fetchSessionsFromSection(section: ISection) {
     return await fetch(`http://127.0.0.1:4000/api/session/get_sessions_from_section?nrc=${section.nrc}`,
       { headers: { 'Accept': 'application/json' } })
       .then(response => response.json())
       .catch(e => { console.error("No se pudo obtener las sessiones de la seccion") })
-      .then(data => {
+      .then(async data => {
         if (data === undefined) { return }
         let newSection: ISection = {
           nrc: section.nrc,
           teacher: section.teacher,
           subject: section.subject,
-          sessionList: data.map((session: any) => {
-            let newSession: ISession = {
-              day: session.day,
-              start: new Date(session.start),
-              end: new Date(session.end),
-              section: section,
-            }
-            return newSession
-          })
+          sessionList: await Promise.all(data.map(async (id: string) => await fetchSessionFromId(id, section)))
+
         }
         setSelectedSection(newSection)
       })
@@ -406,7 +415,9 @@ export default function TimeBlockInterface() {
         return ret
       })
     )
+
     deleteSectionFromDatabase(section)
+
     if (section === selectedSection) { setSelectedSection(undefined); }
     return ret
   }
@@ -454,7 +465,10 @@ export default function TimeBlockInterface() {
         saved = false;
         console.error("ERROR unable to delete session from section ", e);
       })
-      
+      .finally(() => {
+        if (saved) { changeSelectedSection(section) }
+      })
+
   }
 
   async function saveNewSessionToSection(session: ISession, section: ISection) {
@@ -467,51 +481,43 @@ export default function TimeBlockInterface() {
         console.error("ERROR unable to create section ", e)
       })
       .then(data => {
-        if (saved) { setSelectedSection(section) }
+        if (saved) {
+          changeSelectedSection(section)
+        }
       })
   }
 
   function addClassToSection(section: ISection): ISection {
     function ReturnDate(hours: number, minutes: number): Date {
-      let ret = new Date()
+      let ret = new Date(0)
       ret.setHours(hours)
       ret.setMinutes(minutes)
       return ret
     }
 
-    let newSession: ISession = { day: 0, end: ReturnDate(6, 15), start: ReturnDate(6, 0), section: section }
-    setLoadedSubjects(
-      loadedSubjects?.map((x) => {
-        if (!x.sectionList.includes(section)) return x;
-        section.sessionList.push(newSession)
-        return x;
-      })
-    )
+    let newSession: ISession = { day: 1, end: ReturnDate(6, 15), start: ReturnDate(6, 0), section: section }
+    section.sessionList.push(newSession)
 
-    if (section.sessionList.includes(newSession)) { saveNewSessionToSection(newSession, section) }
+    if (section.sessionList.includes(newSession)) {
+      saveNewSessionToSection(newSession, section)
+    }
     return section
   }
 
   function removeClassFromSection(section: ISection, session: ISession): ISection {
-    setLoadedSubjects(
-      loadedSubjects?.map((x) => {
-        if (!x.sectionList.includes(section)) return x;
-        section.sessionList = section.sessionList.filter(y => y !== session)
-        return x;
-      })
-    )
-    setSelectedSection(section)
+    section.sessionList = section.sessionList.filter(y => y !== session)
+    deleteSessionFromSection(session, section)
     return section
   }
 
   async function updateClassFromServer(oldSession: ISession, newSession: ISession, section: ISection) {
-    let variables = `oldday=${oldSession.day}&`+
-    `oldstart=${oldSession.start.getTime()}&`+
-    `oldend=${oldSession.end.getTime()}&`+
-    `newday=${newSession.day}&`+
-    `newstart=${newSession.start.getTime()}&`+
-    `newend=${newSession.end.getTime()}&`+
-    `nrc=${section.nrc}`
+    let variables = `oldday=${oldSession.day}&` +
+      `oldstart=${oldSession.start.getTime()}&` +
+      `oldend=${oldSession.end.getTime()}&` +
+      `newday=${newSession.day}&` +
+      `newstart=${newSession.start.getTime()}&` +
+      `newend=${newSession.end.getTime()}&` +
+      `nrc=${section.nrc}`
 
     let changed = true
     await fetch(`http://127.0.0.1:4000/api/session/updateSession?${variables}`,
@@ -521,16 +527,17 @@ export default function TimeBlockInterface() {
         changed = false
         console.error("ERROR updating session ", e)
       })
-      .finally(() => { if (changed) {
-        setSelectedSection(section)
-      } })
+      .finally(() => {
+        changeSelectedSection(section)
+      })
   }
 
-
   function updateClassFromSection(section: ISection, oldSession: ISession, newSession: ISession): ISection {
-    section.sessionList[section.sessionList.indexOf(oldSession)] = newSession
+    if (newSession.start.getHours() * 60 + newSession.start.getMinutes() >= newSession.end.getHours() * 60 + newSession.end.getMinutes()){ return section; }
     if (oldSession !== newSession) {
-      updateClassFromServer(oldSession, newSession, section)
+      let newSection: ISection = section
+      newSection.sessionList[newSection.sessionList.indexOf(oldSession)] = newSession
+      updateClassFromServer(oldSession, newSession, newSection)
     }
     return section
   }

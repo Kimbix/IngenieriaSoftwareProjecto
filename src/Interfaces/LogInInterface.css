@@ -53,3 +53,8 @@
 .login-button button:active {
   background-color: white;
 }
+
+.login-error {
+  color: red;
+  font-size: 40%;
+}

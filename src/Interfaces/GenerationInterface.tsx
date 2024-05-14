@@ -1,5 +1,5 @@
 import React from "react"
-
+//MARK: Criss puedo importar la librería que pasé para la notificación de el error en la  contraseña?
 import NavigationBar from "./NavigationBar"
 import CourseSemesterContainer from "./CourseSemesterContainer"
 import "./GenerationInterface.css"
@@ -203,6 +203,55 @@ export default function GenerationInterface() {
     return Promise.all(subjects)
   }
 
+  async function fetchSessionFromId(id: string, section: ISection): Promise<ISession> {
+    return await fetch(`http://127.0.0.1:4000/api/session/get_sessions_from_id?id=${id}`,
+      { headers: { 'Accept': 'application/json' } })
+      .then(response => response.json())
+      .catch(e => { console.error(e) })
+      .then(data => {
+        let newSession: ISession = {
+          day: data.day,
+          start: new Date(data.start),
+          end: new Date(data.end),
+          section: section,
+        }
+        return newSession
+      })
+  }
+
+  async function fetchSessionsFromSection(section: ISection): Promise<ISection> {
+    return await fetch(`http://127.0.0.1:4000/api/session/get_sessions_from_section?nrc=${section.nrc}`,
+      { headers: { 'Accept': 'application/json' } })
+      .then(response => response.json())
+      .catch(e => { console.error("No se pudo obtener las sessiones de la seccion") })
+      .then(async data => {
+        if (data === undefined) { return }
+        let newSection: ISection = {
+          nrc: section.nrc,
+          teacher: section.teacher,
+          subject: section.subject,
+          sessionList: await Promise.all(data.map(async (id: string) => await fetchSessionFromId(id, section))),
+          enabled: true,
+        }
+        return newSection
+      })
+  }
+
+  async function fetchSubjectFromId(id: string, section: ISection): Promise<ISubject> {
+    return await fetch(`http://127.0.0.1:4000/api/subjects/get_subjects_from_id?id=${id}`,
+      { headers: { 'Accept': 'application/json' } })
+      .then(response => response.json())
+      .then(data => {
+        let newSubject: ISubject = {
+          color: undefined,
+          enabled: true,
+          name: data.name,
+          sectionList: [section]
+        }
+        return newSubject
+      })
+  }
+
   async function getSchedulesFromServer() {
     let sections: ISection[] = []
     loadedSubjects?.forEach((subject) => {
@@ -215,12 +264,28 @@ export default function GenerationInterface() {
     let nrcString: string = sections.join(",")
 
     let owner = "temp"
-    await fetch(`http://127.0.0.1:4000/api/schedules/generate_schedules?owner=${temp}&nrcs=${nrcString}`,
+    await fetch(`http://127.0.0.1:4000/api/schedules/generate_schedules?owner=${owner}&nrcs=${nrcString}`,
       { headers: { 'Accept': 'application/json' } })
-      .then(response => response.json)
-      .catch(e => { console.error("ERROR generating schedules: ", e)})
-      .then(data => {
-        
+      .then(response => response.json())
+      .then(async data => {
+        let scheduleList: ISchedule[] = []
+        scheduleList = await Promise.all(data.map(async (schedule) => {
+          let newSchedule: ISchedule = {
+            sectionList: await Promise.all(schedule.map(async (section) => {
+              let newSection: ISection = {
+                nrc: section.nrc,
+                teacher: section.teacher,
+                enabled: true,
+              }
+
+              newSection.subject = await fetchSubjectFromId(section.subject, section)
+              newSection = await fetchSessionsFromSection(newSection)
+              return newSection
+            }))
+          }
+          return newSchedule
+        }))
+        setGeneratedSchedules(scheduleList)
       })
   }
 
