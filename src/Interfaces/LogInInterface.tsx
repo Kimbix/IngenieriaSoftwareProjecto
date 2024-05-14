@@ -31,7 +31,7 @@ export default function LogInInterface() {
       .then((data) => {
         if (data.message === "successful") {
           setShowError(false);
-          //window.location.href = "/home";
+          window.location.href = "/";
         } else {
 
           setShowError(true);
