@@ -66,9 +66,13 @@ function ScheduleContainer({ shownShedules }: ScheduleContainerProperties) {
   )
 }
 
-function GenerateButton() {
-  async function sendGenerateSignal(event: any) {
-    alert("We sent a signal to the server, awaiting response")
+interface GenerateButtonProperties {
+  generationBind: any
+}
+
+function GenerateButton({ generationBind }: GenerateButtonProperties) {
+  function sendGenerateSignal() {
+    generationBind()
   }
 
   return (
@@ -116,6 +120,12 @@ function Course({ displayCourse, updateSectionBind, updateCourseBind }: CoursePr
 export default function GenerationInterface() {
   const [loadedSubjects, setLoadedSubjects] = React.useState<ISubject[]>();
   const [generatedSchedules, setGeneratedSchedules] = React.useState<ISchedule[]>()
+  
+
+  React.useEffect(() => { (async () => {
+    if (loadedSubjects !== undefined) { return; }
+    setLoadedSubjects(await loadFromServer())
+  })() })
 
   const [scheduleIndex, setScheduleIndex] = React.useState<number>(0)
 
@@ -148,6 +158,75 @@ export default function GenerationInterface() {
     )
   }
 
+  React.useEffect(() => { (async () => {  })() })
+
+  async function loadSectionFromID(subject: ISubject, id: string): Promise<ISection> {
+    let section: ISection = await fetch(`http://127.0.0.1:4000/api/section/get_sections_from_id?id=${id}`,
+      { headers: { 'Accept': 'application/json' } })
+      .then(response => response.json())
+      .then(data => {
+        let newSection: ISection = {
+          nrc: data.nrc,
+          teacher: data.teacher,
+          sessionList: [],
+          subject: subject,
+          enabled: false,
+        }
+        return newSection
+      })
+    return section
+  }
+
+  async function loadSectionsFromIdList(subject: ISubject, Ids: string[]) {
+    if (Ids === undefined || Ids.length === 0) { return []; }
+    let promises = Ids.map(async (id) => { return loadSectionFromID(subject, id) })
+    return Promise.all(promises)
+  }
+
+  async function loadFromServer(): Promise<ISubject[]> {
+    let subjects: Promise<ISubject>[] = await fetch("http://127.0.0.1:4000/api/subjects/get_subjects", {
+      headers: { 'Accept': 'application/json' }
+    })
+      .then(response => response.json())
+      .then((data: any[]) => {
+        return data.map(async (subject) => {
+          let newSubject: ISubject = {
+            name: subject.name,
+            sectionList: await loadSectionsFromIdList(subject, subject.sections),
+            enabled: false,
+            color: undefined
+          }
+          console.log(newSubject)
+          return newSubject
+        })
+      })
+    return Promise.all(subjects)
+  }
+
+  async function getSchedulesFromServer() {
+    let sections: ISection[] = []
+    loadedSubjects?.forEach((subject) => {
+      if (!subject.enabled) { return; }
+      sections = sections.concat(subject.sectionList.filter(section => section.enabled))
+    })
+
+    if (sections.length === 0) { return undefined; }
+    sections = sections.map(section => section.nrc)
+    let nrcString: string = sections.join(",")
+
+    let owner = "temp"
+    await fetch(`http://127.0.0.1:4000/api/schedules/generate_schedules?owner=${temp}&nrcs=${nrcString}`,
+      { headers: { 'Accept': 'application/json' } })
+      .then(response => response.json)
+      .catch(e => { console.error("ERROR generating schedules: ", e)})
+      .then(data => {
+        
+      })
+  }
+
+  function generateSchedules() {
+    getSchedulesFromServer()
+  }
 
   return (
     <div>
@@ -160,7 +239,7 @@ export default function GenerationInterface() {
               return <Course displayCourse={value} updateSectionBind={updateSectionFromCourse} updateCourseBind={updateCourse} />
             })}
           </div>
-          <GenerateButton />
+          <GenerateButton generationBind={generateSchedules}/>
         </div>
         {generatedSchedules !== undefined && <div className="schedule-box">
           <div className="action-buttons">

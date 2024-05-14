@@ -6,9 +6,10 @@ import reportWebVitals from './reportWebVitals.js';
 import LandingInterface from './Interfaces/LandingInterface.tsx';
 import GenerationInterface from "./Interfaces/GenerationInterface.tsx";
 import LogInInterface from './Interfaces/LogInInterface.tsx';
+import SignUpInterface from './Interfaces/SignUpInterface.tsx';
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { connectToDatabase, disconnectFromDatabase } from './controller/ControllerDB.ts';
+import TimeBlockInterface from './Interfaces/TimeBlockInterface.tsx';
 
 
 export default function App() {
@@ -18,14 +19,15 @@ export default function App() {
       <Route path="/">
         <Route index element={<LandingInterface/>}/>
         <Route path="generation" element={<GenerationInterface/>}/>
+        <Route path="time_blocks" element={<TimeBlockInterface/>}/>
         <Route path="login" element={<LogInInterface/>}/>
+        <Route path="sign_up" element={<SignUpInterface/>}/>
       </Route>
      </Routes>
     </BrowserRouter>
   )
 }
 
-connectToDatabase();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App/>);
@@ -33,7 +35,6 @@ root.render(<App/>);
 window.addEventListener("beforeunload", (event) => {
   // Tu código aquí
   console.log("El usuario está cerrando la página");
-  disconnectFromDatabase();
   // Si deseas mostrar un mensaje de confirmación antes de cerrar, descomenta la siguiente línea:
   // event.returnValue = '¿Estás seguro de que quieres salir?';
 });
