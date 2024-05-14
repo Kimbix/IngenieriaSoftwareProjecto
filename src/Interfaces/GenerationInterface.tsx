@@ -5,6 +5,8 @@ import CourseSemesterContainer from "./CourseSemesterContainer"
 import "./GenerationInterface.css"
 import ScheduleViewer from "./ScheduleViewer.tsx"
 
+const email = sessionStorage.getItem("login")
+
 const colors = [
   "#484349", "#431E82", "#792359", "#92233B",
   "#D7263D", "#A83E28", "#772E25", "#8F5800",
@@ -46,20 +48,21 @@ interface CourseProperties {
 
 interface ScheduleContainerProperties {
   shownShedules: ISchedule[]
+  saveScheduleBind: any
 }
 
 
-function ScheduleContainer({ shownShedules }: ScheduleContainerProperties) {
+function ScheduleContainer({ shownShedules, saveScheduleBind }: ScheduleContainerProperties) {
   return (
     <div className="schedule-container">
       <div className="schedule-flex">
         <div className="two-schedules">
-          {shownShedules[0] !== undefined && <button> <ScheduleViewer loadedSchedule={shownShedules[0]} /> </button>}
-          {shownShedules[1] !== undefined && <button> <ScheduleViewer loadedSchedule={shownShedules[1]} /> </button>}
+          {shownShedules[0] !== undefined && <button onClick={() => saveScheduleBind(shownShedules[0])}> <ScheduleViewer loadedSchedule={shownShedules[0]} /> </button>}
+          {shownShedules[1] !== undefined && <button onClick={() => saveScheduleBind(shownShedules[1])}> <ScheduleViewer loadedSchedule={shownShedules[1]} /> </button>}
         </div>
         <div className="two-schedules">
-          {shownShedules[2] !== undefined && <button> <ScheduleViewer loadedSchedule={shownShedules[2]} /> </button>}
-          {shownShedules[3] !== undefined && <button> <ScheduleViewer loadedSchedule={shownShedules[3]} /> </button>}
+          {shownShedules[2] !== undefined && <button onClick={() => saveScheduleBind(shownShedules[2])}> <ScheduleViewer loadedSchedule={shownShedules[0]} /> </button>}
+          {shownShedules[3] !== undefined && <button onClick={() => saveScheduleBind(shownShedules[3])}> <ScheduleViewer loadedSchedule={shownShedules[1]} /> </button>}
         </div>
       </div>
     </div>
@@ -263,7 +266,7 @@ export default function GenerationInterface() {
     sections = sections.map(section => section.nrc)
     let nrcString: string = sections.join(",")
 
-    let owner = "temp"
+    let owner = email
     await fetch(`http://127.0.0.1:4000/api/schedules/generate_schedules?owner=${owner}&nrcs=${nrcString}`,
       { headers: { 'Accept': 'application/json' } })
       .then(response => response.json())
@@ -277,7 +280,6 @@ export default function GenerationInterface() {
                 teacher: section.teacher,
                 enabled: true,
               }
-
               newSection.subject = await fetchSubjectFromId(section.subject, section)
               newSection = await fetchSessionsFromSection(newSection)
               return newSection
@@ -287,6 +289,14 @@ export default function GenerationInterface() {
         }))
         setGeneratedSchedules(scheduleList)
       })
+  }
+
+  async function saveScheduleToServer(schedule: ISchedule) {
+    let nrcs = schedule.sectionList.map(section => section.nrc).join(',')
+    await fetch(`http://127.0.0.1:4000/api/schedules/save_schedule?owner=${email}&nrcs=${nrcs}`,
+      { headers: { 'Accept': 'application/json' } })
+      .then(response => response)
+      .catch(e => { console.error("ERROR SAVING schedule ", e)})
   }
 
   function generateSchedules() {
@@ -311,7 +321,7 @@ export default function GenerationInterface() {
             <button className="filter-button" type="button">filter</button>
           </div>
 
-          <ScheduleContainer shownShedules={generatedSchedules.slice(scheduleIndex, scheduleIndex + 4)} />
+          <ScheduleContainer saveScheduleBind={saveScheduleToServer} shownShedules={generatedSchedules.slice(scheduleIndex, scheduleIndex + 4)} />
 
           <div className="nav-buttons">
             <div className="ll-button">

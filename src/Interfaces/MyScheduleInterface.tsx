@@ -4,80 +4,92 @@ import { useState } from "react"
 import NavigationBar from "./NavigationBar"
 import "./MyScheduleInterface.css"
 
-import { type ISchedule, type ISubject, type ISection, type ISession } from "./ScheduleViewer.tsx";
+import { type ISchedule, type ISection, type ISubject } from "./ScheduleViewer.tsx"
 import ScheduleViewer from "./ScheduleViewer.tsx"
 
-const storedData = sessionStorage.getItem("login");
-const loginData = storedData !== null ? JSON.parse(storedData) : null;
-if (loginData === null) {
-  console.log("not logged in");
-}
+const email = sessionStorage.getItem("login");
 
-async function getHorario() {
-  return await fetch("http://127.0.0.1/api/section/get_schedule_from_owner?ownerName=JohnDoe")
-    .then((response) => response.json())
-    .then((data) => console.log(data)) // logs the schedule object
-    .catch((error) => console.error("Error:", error));
-  
-}
 
 export default function MySheduleInterface() {
   const [loadedSchedule, setLoadedSchedule] = React.useState()
-  const [showError, setShowError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
 
-
-  const handleClick = () => {
-    /* SendLoginDatabase()
-      .then((data) => {
-        if (data === "successful") {
-          setShowError(false);
-          //window.location.href = "/home";
-        } else {
-          
-          setShowError(true);
-          if (data === "User doesn't exist") {
-            setErrorMessage("Usuario no encontrado");
-          } else if (data === "password doesn't match") {
-            setErrorMessage("Contraseña incorrecta");
-          } else {
-            setErrorMessage("Error desconocido");
-          }
+  async function fetchSessionFromId(id: string, section: ISection): Promise<ISession> {
+    return await fetch(`http://127.0.0.1:4000/api/session/get_sessions_from_id?id=${id}`,
+      { headers: { 'Accept': 'application/json' } })
+      .then(response => response.json())
+      .catch(e => { console.error(e) })
+      .then(data => {
+        console.log(data)
+        let newSession: ISession = {
+          day: data.day,
+          start: new Date(data.start),
+          end: new Date(data.end),
+          section: section,
         }
+        return newSession
       })
-      .catch(() => {
-        setShowError(true);
-      }); */
-  };
+  }
 
+  async function fetchSubjectFromId(id: string, section: ISection): Promise<ISubject> {
+    return await fetch(`http://127.0.0.1:4000/api/subjects/get_subjects_from_id?id=${id}`,
+      { headers: { 'Accept': 'application/json' } })
+      .then(response => response.json())
+      .then(data => {
+        let newSubject: ISubject = {
+          color: undefined,
+          name: data.name,
+        }
+        return newSubject
+      })
+  }
 
-  /*     <div>
-        <NavigationBar />
-        <div className="main-container">
-          <div className="login-container">
-            <div className="login-bg">
-              <div className="login-header">Horarios Plus Plus</div>
-              {showError && <div className="login-error">{errorMessage}</div>}
-              <div className="login-user">
-                <input placeholder="Email" type="text" />
-              </div>
-              <div className="login-password">
-                <input placeholder="Contraseña" type="text" />
-              </div>
-              <div className="login-button">
-                <button type="button" onClick={handleClick}>
-                  Iniciar Sesion
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> */
+  async function loadSectionFromID(id: string): Promise<ISection> {
+    let section: ISection = await fetch(`http://127.0.0.1:4000/api/section/get_sections_from_id?id=${id}`,
+      { headers: { 'Accept': 'application/json' } })
+      .then(response => response.json())
+      .then(async data => {
+        let newSection: ISection = {
+          nrc: data.nrc,
+          teacher: data.teacher,
+        }
+        newSection.subject = await fetchSubjectFromId(data.subject, newSection)
+        newSection.sessionList = await Promise.all(data.sessions.map(async (id: string) => {
+          return await fetchSessionFromId(id, newSection)
+        }))
+        return newSection
+      })
+    return section
+  }
+
+  async function getSchedule() {
+    return await fetch(`http://127.0.0.1:4000/api/schedule/get_schedule_from_owner?owner=${email}`,
+      { headers: { 'Accept': 'application/json' } })
+      .then((response) => response.json())
+      .catch(e => { console.error("ERROR loading user schedule ", e) })
+      .then(async data => {
+        console.log(data)
+        let newSchedule: ISchedule = {
+          sectionList: await Promise.all(data.sections.map(async (id: string) => {
+            return await loadSectionFromID(id)
+          }))
+        }
+        console.log(newSchedule)
+        return newSchedule
+      })
+  }
+
+  React.useEffect(() => {
+    (async () => {
+      if (loadedSchedule) { return; }
+      setLoadedSchedule(await getSchedule())
+    })()
+  })
+
   return (
     <div>
       <NavigationBar />
       <div className="main-container">
-        {loadedSchedule !== undefined && <ScheduleViewer loadedSchedule={loadedSchedule} /> }
+        {loadedSchedule !== undefined && <ScheduleViewer loadedSchedule={loadedSchedule} />}
       </div>
     </div>
   );
