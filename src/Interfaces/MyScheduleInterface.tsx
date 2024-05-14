@@ -44,9 +44,14 @@ export default function MySheduleInterface() {
   }
 
   async function loadSectionFromID(id: string): Promise<ISection> {
+    let fetched = true
     let section: ISection = await fetch(`http://127.0.0.1:4000/api/section/get_sections_from_id?id=${id}`,
       { headers: { 'Accept': 'application/json' } })
       .then(response => response.json())
+      .catch(e => {
+        fetched = false
+        console.error("ERROR Loading section ", e)
+      })
       .then(async data => {
         let newSection: ISection = {
           nrc: data.nrc,
@@ -62,11 +67,16 @@ export default function MySheduleInterface() {
   }
 
   async function getSchedule() {
+    let fetched = true
     return await fetch(`http://127.0.0.1:4000/api/schedule/get_schedule_from_owner?owner=${email}`,
       { headers: { 'Accept': 'application/json' } })
       .then((response) => response.json())
-      .catch(e => { console.error("ERROR loading user schedule ", e) })
+      .catch(e => {
+        fetched = false
+        console.error("ERROR loading user schedule ", e)
+      })
       .then(async data => {
+        if (!fetched) { return { sectionList: [] } }
         console.log(data)
         let newSchedule: ISchedule = {
           sectionList: await Promise.all(data.sections.map(async (id: string) => {

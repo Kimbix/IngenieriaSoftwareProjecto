@@ -1,5 +1,5 @@
 const storedData = sessionStorage.getItem('login');
-const loggedIn = storedData !== undefined
+const loggedIn = !(storedData === null)
 
 export default function NavigationBar() {
   return (
