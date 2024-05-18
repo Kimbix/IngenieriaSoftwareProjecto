@@ -1,5 +1,5 @@
 .navbar-container {
-  background: var(--background-accent-semi-light-color);
+  background: var(--background-light-color);
   position: absolute;
   top: 0;
 
@@ -31,6 +31,8 @@
 .navbar-container div:hover  {
   background-color: var(--foreground-hyperlink-color);
 }
+
+.sign-up div { margin-left: auto; }
 
 .navbar-container a {
   color: white;

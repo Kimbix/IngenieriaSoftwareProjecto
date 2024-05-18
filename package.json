@@ -3,18 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ngrok/ngrok-api": "^0.11.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
+    "assert": "^2.1.0",
+    "axios": "^1.6.8",
+    "bundle": "^2.1.0",
+    "mongoose": "^8.3.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.23.1",
     "react-scripts": "5.0.1",
     "tailwind": "^4.0.0",
     "vite": "^5.2.11",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "zod": "^3.23.8"
   },
   "scripts": {
     "start": "react-scripts start",
